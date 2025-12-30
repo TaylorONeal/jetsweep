@@ -11,6 +11,7 @@ export interface FlightInputs {
   transportType: 'rideshare' | 'car';
   isHoliday: boolean;
   isBadWeather: boolean;
+  riskPreference: 'early' | 'balanced' | 'risky';
 }
 
 export interface TimeRange {
@@ -63,6 +64,12 @@ function subtractMinutes(date: Date, minutes: number): Date {
   return new Date(date.getTime() - minutes * 60 * 1000);
 }
 
+// Apply risk multiplier to get the buffer time from a range
+// early = max, balanced = 75% between min and max, risky = min
+function getRiskAdjustedTime(range: TimeRange, multiplier: number): number {
+  return Math.round(range.min + (range.max - range.min) * multiplier);
+}
+
 function formatTimeRange(range: TimeRange): string {
   if (range.min === range.max) return `${range.min} min`;
   return `${range.min}–${range.max} min`;
@@ -80,11 +87,16 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     transportType,
     isHoliday,
     isBadWeather,
+    riskPreference,
   } = inputs;
 
   const isInternational = tripType === 'international';
   const isFamily = groupType === 'family';
   const isRideshare = transportType === 'rideshare';
+
+  // Risk multiplier affects buffer times
+  // early = use max times (1.0), balanced = use ~75% (0.75), risky = use min times (0.5)
+  const riskMultiplier = riskPreference === 'early' ? 1.0 : riskPreference === 'balanced' ? 0.75 : 0.5;
 
   // Get airport profile
   const { profile: airportProfile, isEstimate: isAirportEstimate } = airport
@@ -120,25 +132,27 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       : 'Be at gate when boarding starts for overhead bin space',
   });
 
-  // Gate arrival
-  const gateBufferMin = isInternational ? 30 : 20;
+  // Gate arrival - apply risk multiplier
+  const gateBufferBase: TimeRange = isInternational ? { min: 20, max: 30 } : { min: 15, max: 25 };
+  const gateBufferMin = getRiskAdjustedTime(gateBufferBase, riskMultiplier);
   const gateArrival = subtractMinutes(boardingStart, gateBufferMin);
   const walkRange: TimeRange = isInternational 
     ? { min: Math.max(15, airportProfile.walk[0]), max: Math.max(25, airportProfile.walk[1]) }
     : { min: airportProfile.walk[0], max: airportProfile.walk[1] };
+  const walkTime = getRiskAdjustedTime(walkRange, riskMultiplier);
 
   stages.unshift({
     id: 'gate',
     label: 'Gate Arrival',
     icon: 'door-open',
-    startTime: subtractMinutes(gateArrival, walkRange.max),
+    startTime: subtractMinutes(gateArrival, walkTime),
     endTime: gateArrival,
     durationRange: walkRange,
     note: `${formatTimeRange(walkRange)} walk through terminal${airportProfile.painPoint ? `. ${airportProfile.painPoint}` : ''}`,
   });
 
   // Check if there's buffer for lounge/food
-  const securityExitTarget = subtractMinutes(gateArrival, walkRange.max);
+  const securityExitTarget = subtractMinutes(gateArrival, walkTime);
 
   // Security
   let securityBase: TimeRange;
@@ -169,7 +183,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
   );
 
   const securityEnd = securityExitTarget;
-  const securityStart = subtractMinutes(securityEnd, securityRange.max);
+  const securityTime = getRiskAdjustedTime(securityRange, riskMultiplier);
+  const securityStart = subtractMinutes(securityEnd, securityTime);
 
   stages.unshift({
     id: 'security',
@@ -209,7 +224,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       { min: 5, max: 10 }
     );
 
-    const baggageStart = subtractMinutes(securityStart, baggageRange.max);
+    const baggageTime = getRiskAdjustedTime(baggageRange, riskMultiplier);
+    const baggageStart = subtractMinutes(securityStart, baggageTime);
     baggageEnd = securityStart;
 
     stages.unshift({
@@ -235,7 +251,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     max: airportProfile.curb[1],
   };
 
-  const arrivalStart = subtractMinutes(arrivalTarget, curbRange.max);
+  const curbTime = getRiskAdjustedTime(curbRange, riskMultiplier);
+  const arrivalStart = subtractMinutes(arrivalTarget, curbTime);
 
   stages.unshift({
     id: 'arrival',
@@ -266,7 +283,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     );
 
     const pickupEnd = arrivalStart;
-    const pickupStart = subtractMinutes(pickupEnd, pickupRange.max);
+    const pickupTime = getRiskAdjustedTime(pickupRange, riskMultiplier);
+    const pickupStart = subtractMinutes(pickupEnd, pickupTime);
 
     stages.unshift({
       id: 'pickup',
@@ -283,7 +301,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     // Call rideshare
     const callRange: TimeRange = { min: 2, max: 5 };
     const callEnd = pickupStart;
-    const callStart = subtractMinutes(callEnd, callRange.max);
+    const callTime = getRiskAdjustedTime(callRange, riskMultiplier);
+    const callStart = subtractMinutes(callEnd, callTime);
 
     stages.unshift({
       id: 'call',
@@ -312,7 +331,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     );
 
     const parkingEnd = arrivalStart;
-    const parkingStart = subtractMinutes(parkingEnd, parkingRange.max);
+    const parkingTime = getRiskAdjustedTime(parkingRange, riskMultiplier);
+    const parkingStart = subtractMinutes(parkingEnd, parkingTime);
 
     stages.unshift({
       id: 'parking',
@@ -325,13 +345,15 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     });
 
     // Head to car
+    const headToCarRange: TimeRange = { min: 3, max: 5 };
+    const headToCarTime = getRiskAdjustedTime(headToCarRange, riskMultiplier);
     stages.unshift({
       id: 'leave',
       label: 'Head to Car',
       icon: 'home',
-      startTime: subtractMinutes(parkingStart, 5),
+      startTime: subtractMinutes(parkingStart, headToCarTime),
       endTime: parkingStart,
-      durationRange: { min: 3, max: 5 },
+      durationRange: headToCarRange,
       note: 'Final check: ID, phone, charger, bags',
     });
   }

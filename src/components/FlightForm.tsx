@@ -43,6 +43,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
   const [airport, setAirport] = useState('');
   const [groupType, setGroupType] = useState<'solo' | 'family'>('solo');
   const [transportType, setTransportType] = useState<'rideshare' | 'car'>('rideshare');
+  const [riskPreference, setRiskPreference] = useState<'early' | 'balanced' | 'risky'>('balanced');
   const [isHoliday, setIsHoliday] = useState(false);
   const [isBadWeather, setIsBadWeather] = useState(false);
 
@@ -72,6 +73,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
       airport: airport || undefined,
       groupType,
       transportType,
+      riskPreference,
       isHoliday,
       isBadWeather,
     });
@@ -162,7 +164,53 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
 
       <div className="deco-divider" />
 
-      {/* Security Section */}
+      {/* Risk Preference */}
+      <section className="space-y-4">
+        <h2 className="deco-header text-sm text-primary tracking-widest">
+          How do you travel?
+        </h2>
+        
+        <div className="grid grid-cols-3 gap-2">
+          <button
+            type="button"
+            onClick={() => setRiskPreference('early')}
+            className={`py-3 px-2 rounded-lg border text-xs font-medium transition-all text-center
+              ${riskPreference === 'early' 
+                ? 'bg-primary/20 border-primary text-primary' 
+                : 'bg-secondary border-border text-muted-foreground hover:text-foreground'
+              }`}
+          >
+            <span className="block text-lg mb-1">🦅</span>
+            Early Bird
+          </button>
+          <button
+            type="button"
+            onClick={() => setRiskPreference('balanced')}
+            className={`py-3 px-2 rounded-lg border text-xs font-medium transition-all text-center
+              ${riskPreference === 'balanced' 
+                ? 'bg-primary/20 border-primary text-primary' 
+                : 'bg-secondary border-border text-muted-foreground hover:text-foreground'
+              }`}
+          >
+            <span className="block text-lg mb-1">⚖️</span>
+            Balanced
+          </button>
+          <button
+            type="button"
+            onClick={() => setRiskPreference('risky')}
+            className={`py-3 px-2 rounded-lg border text-xs font-medium transition-all text-center
+              ${riskPreference === 'risky' 
+                ? 'bg-primary/20 border-primary text-primary' 
+                : 'bg-secondary border-border text-muted-foreground hover:text-foreground'
+              }`}
+          >
+            <span className="block text-lg mb-1">🎲</span>
+            Seat of Pants
+          </button>
+        </div>
+      </section>
+
+      <div className="deco-divider" />
       <section className="space-y-4">
         <h2 className="deco-header text-sm text-primary tracking-widest flex items-center gap-2">
           <Shield className="w-4 h-4" />
