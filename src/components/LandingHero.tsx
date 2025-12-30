@@ -46,7 +46,7 @@ export function LandingHero({ onStart }: LandingHeroProps) {
             size="xl"
             className="w-full mt-10"
           >
-            Build my timeline
+            Show me when to leave
           </Button>
         </div>
       </main>
