@@ -55,10 +55,8 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
     if (airport) {
       const { profile } = getAirportProfile(airport);
       setDefaultDriveTime(profile.typicalDriveTime);
-      // Only set if user hasn't entered a custom value
-      if (!driveTime) {
-        setDriveTime(profile.typicalDriveTime.toString());
-      }
+      // Always update drive time when airport changes
+      setDriveTime(profile.typicalDriveTime.toString());
     }
   }, [airport]);
 
