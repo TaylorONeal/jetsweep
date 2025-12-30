@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { FlightInputs } from '@/lib/timeline';
-import { getAllAirports, OTHER_AIRPORT_OPTIONS, getAirportProfile } from '@/lib/airports';
+import { getAllAirports, OTHER_AIRPORT_OPTIONS, getAirportProfile, AirportProfile } from '@/lib/airports';
 import { Button } from '@/components/ui/button';
 import { 
   Shield, 
@@ -15,17 +15,24 @@ import {
   MapPin,
   Calendar,
   Clock,
-  Navigation
+  Navigation,
+  Check,
+  ChevronsUpDown
 } from 'lucide-react';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectGroup,
-  SelectLabel,
-} from '@/components/ui/select';
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 interface FlightFormProps {
   onSubmit: (inputs: FlightInputs) => void;
@@ -41,9 +48,13 @@ function getDefaultDateTime() {
 
 export function FlightForm({ onSubmit }: FlightFormProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [airportOpen, setAirportOpen] = useState(false);
   
   // Initialize with defaults (4 hours from now)
   const defaults = getDefaultDateTime();
+  
+  // Get sorted airports (memoized)
+  const allAirports = useMemo(() => getAllAirports(), []);
   
   // Form state
   const [departureDate, setDepartureDate] = useState(defaults.dateStr);
@@ -60,6 +71,16 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
   const [isBadWeather, setIsBadWeather] = useState(false);
   const [driveTime, setDriveTime] = useState<string>('');
   const [defaultDriveTime, setDefaultDriveTime] = useState<number>(25);
+  
+  // Get selected airport display
+  const selectedAirport = useMemo(() => {
+    if (!airport) return null;
+    const found = allAirports.find(a => a.code === airport);
+    if (found) return found;
+    const other = OTHER_AIRPORT_OPTIONS.find(a => a.code === airport);
+    if (other) return { code: other.code, name: other.name } as AirportProfile;
+    return null;
+  }, [airport, allAirports]);
 
   // Update default drive time when airport changes
   useEffect(() => {
@@ -109,42 +130,77 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
           Airport
         </h2>
         
-        <Select value={airport} onValueChange={setAirport}>
-          <SelectTrigger className="w-full input-field h-auto py-3">
-            <SelectValue placeholder="Select your airport" />
-          </SelectTrigger>
-          <SelectContent className="bg-card border-border max-h-[300px]">
-            <SelectGroup>
-              <SelectLabel className="text-muted-foreground text-xs uppercase tracking-wider">
-                Top 100 US Airports
-              </SelectLabel>
-              {getAllAirports().map((a) => (
-                <SelectItem 
-                  key={a.code} 
-                  value={a.code}
-                  className="cursor-pointer"
-                >
-                  <span className="font-mono text-primary mr-2">{a.code}</span>
-                  <span className="text-foreground">{a.name}</span>
-                </SelectItem>
-              ))}
-            </SelectGroup>
-            <SelectGroup>
-              <SelectLabel className="text-muted-foreground text-xs uppercase tracking-wider mt-2">
-                Other Airports
-              </SelectLabel>
-              {OTHER_AIRPORT_OPTIONS.map((a) => (
-                <SelectItem 
-                  key={a.code} 
-                  value={a.code}
-                  className="cursor-pointer"
-                >
-                  <span className="text-foreground">{a.name}</span>
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        <Popover open={airportOpen} onOpenChange={setAirportOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={airportOpen}
+              className="w-full input-field h-auto py-3 justify-between font-normal"
+            >
+              {selectedAirport ? (
+                <span className="flex items-center gap-2">
+                  <span className="font-mono text-primary">{selectedAirport.code}</span>
+                  <span className="text-foreground truncate">{selectedAirport.name}</span>
+                </span>
+              ) : (
+                <span className="text-muted-foreground">Search or select airport...</span>
+              )}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-card border-border" align="start">
+            <Command className="bg-transparent">
+              <CommandInput placeholder="Type airport code or name..." className="border-none focus:ring-0" />
+              <CommandList className="max-h-[300px]">
+                <CommandEmpty>No airport found.</CommandEmpty>
+                <CommandGroup heading="Top 100 US Airports">
+                  {allAirports.map((a) => (
+                    <CommandItem
+                      key={a.code}
+                      value={`${a.code} ${a.name}`}
+                      onSelect={() => {
+                        setAirport(a.code);
+                        setAirportOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          airport === a.code ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      <span className="font-mono text-primary mr-2">{a.code}</span>
+                      <span className="text-foreground truncate">{a.name}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+                <CommandGroup heading="Other Airports">
+                  {OTHER_AIRPORT_OPTIONS.map((a) => (
+                    <CommandItem
+                      key={a.code}
+                      value={a.name}
+                      onSelect={() => {
+                        setAirport(a.code);
+                        setAirportOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          airport === a.code ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      <span className="text-foreground">{a.name}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       </section>
 
       {/* Drive Time */}

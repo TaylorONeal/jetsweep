@@ -190,9 +190,11 @@ function buildAirportProfile(code: string): AirportProfile {
   };
 }
 
-// Get all known airports for the dropdown
+// Get all known airports for the dropdown (sorted alphabetically by code)
 export function getAllAirports(): AirportProfile[] {
-  return Object.keys(AIRPORT_TIER_MAP).map(code => buildAirportProfile(code));
+  return Object.keys(AIRPORT_TIER_MAP)
+    .sort((a, b) => a.localeCompare(b))
+    .map(code => buildAirportProfile(code));
 }
 
 export function findAirport(query: string): AirportProfile | null {
