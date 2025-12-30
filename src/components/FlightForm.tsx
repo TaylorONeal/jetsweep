@@ -73,8 +73,8 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
       // If only date, assume noon
       departureDateTime = new Date(`${departureDate}T12:00`);
     } else {
-      // If nothing specified, assume 2 hours from now
-      departureDateTime = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      // If nothing specified, assume 4 hours from now
+      departureDateTime = new Date(Date.now() + 4 * 60 * 60 * 1000);
     }
     
     onSubmit({
@@ -315,6 +315,45 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
 
       <div className="deco-divider" />
 
+      {/* Flight Departure Time - Primary */}
+      <section className="space-y-4">
+        <h2 className="deco-header text-sm text-primary tracking-widest flex items-center gap-2">
+          <Clock className="w-4 h-4" />
+          Flight Departure
+        </h2>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider">
+              Date
+            </label>
+            <input
+              type="date"
+              value={departureDate}
+              onChange={(e) => setDepartureDate(e.target.value)}
+              className="input-field w-full"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider flex items-center gap-1">
+              <Calendar className="w-3 h-3" />
+              Time
+            </label>
+            <input
+              type="time"
+              value={departureTime}
+              onChange={(e) => setDepartureTime(e.target.value)}
+              className="input-field w-full"
+            />
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Leave blank to calculate for a flight 4 hours from now.
+        </p>
+      </section>
+
+      <div className="deco-divider" />
+
       {/* Advanced options toggle */}
       <button
         type="button"
@@ -327,44 +366,6 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
 
       {showAdvanced && (
         <div className="space-y-6 animate-fade-in">
-          {/* Flight Date/Time - Optional */}
-          <section className="space-y-4">
-            <h2 className="deco-header text-sm text-primary tracking-widest flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Flight Time
-              <span className="text-muted-foreground text-xs normal-case tracking-normal">(optional)</span>
-            </h2>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  value={departureDate}
-                  onChange={(e) => setDepartureDate(e.target.value)}
-                  className="input-field w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  Departure
-                </label>
-                <input
-                  type="time"
-                  value={departureTime}
-                  onChange={(e) => setDepartureTime(e.target.value)}
-                  className="input-field w-full"
-                />
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Leave blank to calculate for a flight 2 hours from now.
-            </p>
-          </section>
-
           {/* Group & Transport */}
           <section className="space-y-4">
             <h2 className="deco-header text-sm text-primary tracking-widest flex items-center gap-2">
