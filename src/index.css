@@ -216,4 +216,30 @@
   .stagger-6 { animation-delay: 0.3s; }
   .stagger-7 { animation-delay: 0.35s; }
   .stagger-8 { animation-delay: 0.4s; }
+
+  /* Airplane motion divider */
+  .airplane-track {
+    pointer-events: none;
+  }
+
+  .airplane-icon {
+    animation: airplane-glide 7s linear infinite;
+  }
+
+  @keyframes airplane-glide {
+    0% {
+      left: -5%;
+      opacity: 0;
+    }
+    5% {
+      opacity: 1;
+    }
+    95% {
+      opacity: 1;
+    }
+    100% {
+      left: 100%;
+      opacity: 0;
+    }
+  }
 }
