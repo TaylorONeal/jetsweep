@@ -1,5 +1,8 @@
-import { TimelineResult, formatTime } from '@/lib/timeline';
+import { TimelineResult, formatTime, StressLevel } from '@/lib/timeline';
 import { TimelineCard } from './TimelineCard';
+import { StressMarginMeter } from './StressMarginMeter';
+import { HeadsUpCallout } from './HeadsUpCallout';
+import { TimelineJetIcon } from './TimelineJetIcon';
 import { 
   Clock, 
   AlertTriangle, 
@@ -21,11 +24,14 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
   const { 
     stages, 
     leaveTime, 
-    leaveTimeRange, 
+    leaveTimeRange,
+    leaveTimeWindow,
     confidence, 
     airportProfile, 
     isAirportEstimate,
-    isLeaveNow 
+    isLeaveNow,
+    stressMargin,
+    stressLevel,
   } = result;
 
   const confidenceConfig = {
@@ -52,7 +58,29 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
     },
   };
 
+  const stressConfig: Record<StressLevel, { label: string; color: string; bg: string; border: string }> = {
+    'CALM': {
+      label: 'Calm',
+      color: 'text-emerald-400',
+      bg: 'bg-emerald-400/10',
+      border: 'border-emerald-400/30',
+    },
+    'TIGHT': {
+      label: 'Tight',
+      color: 'text-amber-400',
+      bg: 'bg-amber-400/10',
+      border: 'border-amber-400/30',
+    },
+    'RISKY': {
+      label: 'Risky',
+      color: 'text-red-400',
+      bg: 'bg-red-400/10',
+      border: 'border-red-400/30',
+    },
+  };
+
   const conf = confidenceConfig[confidence];
+  const stress = stressConfig[stressLevel];
   const ConfIcon = conf.icon;
 
   return (
@@ -87,6 +115,9 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
                 <h1 className="font-display text-5xl font-bold text-primary tracking-tight">
                   {formatTime(leaveTime)}
                 </h1>
+                <p className="text-muted-foreground text-xs mt-1">
+                  Window: {formatTime(leaveTimeWindow.earliest)} – {formatTime(leaveTimeWindow.latest)}
+                </p>
               </>
             )}
             
@@ -106,50 +137,79 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
       </header>
 
       <main className="container py-6">
-        {/* Badges */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {/* Confidence badge */}
-          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${conf.bg} ${conf.border}`}>
-            <ConfIcon className={`w-4 h-4 ${conf.color}`} />
-            <span className={`text-sm font-medium ${conf.color}`}>{conf.label}</span>
-          </div>
+        {/* Summary Card */}
+        <div className="card-elevated rounded-lg p-4 mb-6 deco-border">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            {/* Badges */}
+            <div className="flex flex-wrap gap-2">
+              {/* Confidence badge */}
+              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${conf.bg} ${conf.border}`}>
+                <ConfIcon className={`w-4 h-4 ${conf.color}`} />
+                <span className={`text-sm font-medium ${conf.color}`}>{conf.label}</span>
+              </div>
 
-          {/* Airport badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary border border-border">
-            <span className="text-sm font-mono text-primary">{airportProfile.code}</span>
-            {isAirportEstimate && (
-              <>
-                <span className="text-border">•</span>
-                <span className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Info className="w-3 h-3" />
-                  Estimated
-                </span>
-              </>
-            )}
+              {/* Stress level badge */}
+              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${stress.bg} ${stress.border}`}>
+                <span className={`text-sm font-medium ${stress.color}`}>{stress.label}</span>
+                <span className="text-xs text-muted-foreground">({stressMargin} min buffer)</span>
+              </div>
+
+              {/* Airport badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary border border-border">
+                <span className="text-sm font-mono text-primary">{airportProfile.code}</span>
+                {isAirportEstimate && (
+                  <>
+                    <span className="text-border">•</span>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Info className="w-3 h-3" />
+                      Estimated
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Stress meter */}
+            <StressMarginMeter margin={stressMargin} level={stressLevel} />
           </div>
         </div>
 
-        {/* Airport pain point */}
+        {/* Heads up callout for pain point */}
         {airportProfile.painPoint && (
-          <div className="card-elevated rounded-lg p-4 mb-6 border-l-2 border-l-amber-400/50">
-            <p className="text-sm text-muted-foreground">
-              <span className="text-amber-400 font-medium">Airport Note:</span>{' '}
-              {airportProfile.painPoint}
-            </p>
-          </div>
+          <HeadsUpCallout message={airportProfile.painPoint} />
         )}
 
-        {/* Timeline */}
-        <div className="space-y-0">
-          {stages.map((stage, index) => (
-            <TimelineCard
-              key={stage.id}
-              stage={stage}
-              index={index}
-              isFirst={index === 0}
-              isLast={index === stages.length - 1}
-            />
-          ))}
+        {/* Timeline with animated jet */}
+        <div className="relative">
+          <TimelineJetIcon stageCount={stages.length} />
+          
+          <div className="space-y-0">
+            {stages.map((stage, index) => (
+              <TimelineCard
+                key={stage.id}
+                stage={stage}
+                index={index}
+                isFirst={index === 0}
+                isLast={index === stages.length - 1}
+                painPoint={stage.id === 'security' && airportProfile.painPoint?.toLowerCase().includes('security') 
+                  ? airportProfile.painPoint 
+                  : stage.id === 'arrival' && airportProfile.painPoint?.toLowerCase().includes('curb')
+                    ? airportProfile.painPoint
+                    : undefined}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom summary card */}
+        <div className="card-elevated rounded-lg p-4 mt-6 deco-border">
+          <div className="text-center">
+            <p className="text-muted-foreground text-sm mb-1">Recommended Leave Time</p>
+            <p className="font-display text-2xl font-bold text-primary">{formatTime(leaveTime)}</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {formatTime(leaveTimeWindow.earliest)} (earliest) – {formatTime(leaveTimeWindow.latest)} (latest)
+            </p>
+          </div>
         </div>
 
         {/* Bottom action */}

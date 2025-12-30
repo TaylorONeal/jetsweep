@@ -32,15 +32,20 @@ export interface TimelineStage {
   isOptional?: boolean;
 }
 
+export type StressLevel = 'CALM' | 'TIGHT' | 'RISKY';
+
 export interface TimelineResult {
   stages: TimelineStage[];
   leaveTime: Date;
   leaveTimeRange: TimeRange;
+  leaveTimeWindow: { earliest: Date; latest: Date };
   confidence: 'normal' | 'risky' | 'high-variance';
   airportProfile: AirportProfile;
   isAirportEstimate: boolean;
   isLeaveNow: boolean;
   travelConditions: TravelConditions;
+  stressMargin: number; // minutes of buffer at gate
+  stressLevel: StressLevel;
 }
 
 function addRange(a: TimeRange, b: TimeRange): TimeRange {
@@ -430,15 +435,37 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
   const totalMin = stages.reduce((sum, s) => sum + s.durationRange.min, 0);
   const totalMax = stages.reduce((sum, s) => sum + s.durationRange.max, 0);
 
+  // Calculate leave time window (earliest to latest)
+  const leaveTimeEarliest = subtractMinutes(departureDateTime, totalMax);
+  const leaveTimeLatest = subtractMinutes(departureDateTime, totalMin);
+
+  // Calculate stress margin (time between gate arrival and boarding)
+  const gateStage = stages.find(s => s.id === 'gate');
+  const boardingStage = stages.find(s => s.id === 'boarding');
+  const stressMargin = gateStage && boardingStage 
+    ? Math.round((boardingStage.startTime.getTime() - gateStage.endTime.getTime()) / 60000)
+    : 0;
+
+  // Determine stress level
+  let stressLevel: StressLevel = 'CALM';
+  if (stressMargin < 10) {
+    stressLevel = 'RISKY';
+  } else if (stressMargin < 25) {
+    stressLevel = 'TIGHT';
+  }
+
   return {
     stages,
     leaveTime: isLeaveNow ? now : leaveTime,
     leaveTimeRange: { min: totalMin, max: totalMax },
+    leaveTimeWindow: { earliest: leaveTimeEarliest, latest: leaveTimeLatest },
     confidence,
     airportProfile,
     isAirportEstimate,
     isLeaveNow,
     travelConditions,
+    stressMargin,
+    stressLevel,
   };
 }
 

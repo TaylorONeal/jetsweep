@@ -9,36 +9,158 @@ export interface AirportProfile {
   securityAdd: [number, number];
   baggageAdd: [number, number];
   painPoint: string;
-  typicalDriveTime: number; // Minutes from city center
+  typicalDriveTime: number;
 }
 
-export const TOP_25_AIRPORTS: AirportProfile[] = [
-  { code: 'ATL', name: 'Atlanta Hartsfield-Jackson', tier: 'MEGA', walk: [15, 30], curb: [8, 15], parking: [20, 35], rideshare: [10, 20], securityAdd: [5, 15], baggageAdd: [5, 12], painPoint: 'Massive terminal; long walks between concourses', typicalDriveTime: 25 },
-  { code: 'LAX', name: 'Los Angeles International', tier: 'MEGA', walk: [12, 25], curb: [10, 18], parking: [18, 32], rideshare: [12, 25], securityAdd: [8, 18], baggageAdd: [5, 12], painPoint: 'Separated terminals; rideshare pickup congestion', typicalDriveTime: 35 },
-  { code: 'ORD', name: "Chicago O'Hare", tier: 'MEGA', walk: [14, 28], curb: [7, 14], parking: [18, 30], rideshare: [8, 18], securityAdd: [6, 15], baggageAdd: [5, 12], painPoint: 'Weather delays; terminal transfers can be long', typicalDriveTime: 35 },
-  { code: 'DFW', name: 'Dallas/Fort Worth', tier: 'MEGA', walk: [12, 25], curb: [6, 12], parking: [15, 28], rideshare: [8, 16], securityAdd: [4, 12], baggageAdd: [4, 10], painPoint: 'Sprawling layout; Skylink train adds time', typicalDriveTime: 30 },
-  { code: 'DEN', name: 'Denver International', tier: 'MEGA', walk: [15, 30], curb: [8, 15], parking: [20, 35], rideshare: [10, 20], securityAdd: [5, 15], baggageAdd: [5, 12], painPoint: 'Very long walks; train to gates adds 8-12 min', typicalDriveTime: 40 },
-  { code: 'JFK', name: 'New York JFK', tier: 'MEGA', walk: [10, 22], curb: [8, 15], parking: [18, 32], rideshare: [12, 25], securityAdd: [8, 18], baggageAdd: [6, 15], painPoint: 'Separate terminals; AirTrain connections slow', typicalDriveTime: 50 },
-  { code: 'SFO', name: 'San Francisco International', tier: 'LARGE', walk: [10, 20], curb: [6, 12], parking: [15, 25], rideshare: [8, 16], securityAdd: [5, 12], baggageAdd: [4, 10], painPoint: 'International terminal far; fog delays common', typicalDriveTime: 25 },
-  { code: 'SEA', name: 'Seattle-Tacoma', tier: 'LARGE', walk: [12, 22], curb: [5, 10], parking: [14, 25], rideshare: [7, 14], securityAdd: [4, 10], baggageAdd: [4, 10], painPoint: 'Satellite gates require train; busy mornings', typicalDriveTime: 25 },
-  { code: 'LAS', name: 'Las Vegas Harry Reid', tier: 'LARGE', walk: [12, 24], curb: [6, 12], parking: [15, 28], rideshare: [8, 16], securityAdd: [5, 12], baggageAdd: [4, 10], painPoint: 'Long terminal walks; weekend surge crowds', typicalDriveTime: 15 },
-  { code: 'MCO', name: 'Orlando International', tier: 'LARGE', walk: [14, 26], curb: [6, 12], parking: [15, 28], rideshare: [8, 16], securityAdd: [6, 14], baggageAdd: [5, 12], painPoint: 'Theme park crowds; long security lines', typicalDriveTime: 25 },
-  { code: 'EWR', name: 'Newark Liberty', tier: 'LARGE', walk: [10, 20], curb: [7, 14], parking: [16, 28], rideshare: [10, 20], securityAdd: [6, 14], baggageAdd: [5, 12], painPoint: 'Terminal C congested; AirTrain unreliable', typicalDriveTime: 30 },
-  { code: 'MIA', name: 'Miami International', tier: 'LARGE', walk: [12, 24], curb: [7, 14], parking: [16, 28], rideshare: [8, 18], securityAdd: [6, 14], baggageAdd: [5, 12], painPoint: 'Heavy international traffic; long customs lines', typicalDriveTime: 20 },
-  { code: 'PHX', name: 'Phoenix Sky Harbor', tier: 'LARGE', walk: [10, 20], curb: [5, 10], parking: [12, 22], rideshare: [6, 14], securityAdd: [4, 10], baggageAdd: [3, 8], painPoint: 'Terminal 4 massive; PHX Sky Train adds time', typicalDriveTime: 15 },
-  { code: 'IAH', name: 'Houston George Bush', tier: 'LARGE', walk: [12, 24], curb: [6, 12], parking: [15, 28], rideshare: [8, 16], securityAdd: [5, 12], baggageAdd: [4, 10], painPoint: 'Terminal changes common; Skyway train slow', typicalDriveTime: 30 },
-  { code: 'BOS', name: 'Boston Logan', tier: 'LARGE', walk: [10, 18], curb: [6, 12], parking: [15, 26], rideshare: [8, 16], securityAdd: [5, 12], baggageAdd: [4, 10], painPoint: 'Cramped terminals; traffic congestion severe', typicalDriveTime: 20 },
-  { code: 'MSP', name: 'Minneapolis-St. Paul', tier: 'LARGE', walk: [12, 22], curb: [5, 10], parking: [14, 25], rideshare: [6, 14], securityAdd: [4, 10], baggageAdd: [3, 8], painPoint: 'Concourse changes via tram; winter weather', typicalDriveTime: 20 },
-  { code: 'DTW', name: 'Detroit Metro', tier: 'LARGE', walk: [14, 26], curb: [5, 10], parking: [14, 25], rideshare: [6, 14], securityAdd: [4, 10], baggageAdd: [3, 8], painPoint: 'McNamara terminal extremely long; express tram', typicalDriveTime: 30 },
-  { code: 'FLL', name: 'Fort Lauderdale-Hollywood', tier: 'MEDIUM', walk: [8, 16], curb: [5, 10], parking: [12, 22], rideshare: [6, 14], securityAdd: [4, 10], baggageAdd: [3, 8], painPoint: 'Terminals not connected; cruise traffic spikes', typicalDriveTime: 20 },
-  { code: 'CLT', name: 'Charlotte Douglas', tier: 'LARGE', walk: [12, 24], curb: [5, 10], parking: [14, 25], rideshare: [6, 14], securityAdd: [4, 10], baggageAdd: [3, 8], painPoint: 'Hub congestion; long concourses', typicalDriveTime: 20 },
-  { code: 'PHL', name: 'Philadelphia International', tier: 'LARGE', walk: [10, 20], curb: [6, 12], parking: [14, 26], rideshare: [7, 15], securityAdd: [5, 12], baggageAdd: [4, 10], painPoint: 'Aging infrastructure; terminals spread out', typicalDriveTime: 25 },
-  { code: 'SAN', name: 'San Diego International', tier: 'MEDIUM', walk: [8, 14], curb: [4, 8], parking: [10, 18], rideshare: [5, 12], securityAdd: [3, 8], baggageAdd: [2, 6], painPoint: 'Single runway; terminal 2 more efficient', typicalDriveTime: 15 },
-  { code: 'DCA', name: 'Washington Reagan National', tier: 'MEDIUM', walk: [8, 16], curb: [5, 10], parking: [12, 22], rideshare: [6, 14], securityAdd: [4, 10], baggageAdd: [3, 8], painPoint: 'Metro access good but gates far; tight security', typicalDriveTime: 15 },
-  { code: 'IAD', name: 'Washington Dulles', tier: 'LARGE', walk: [14, 28], curb: [6, 12], parking: [18, 32], rideshare: [8, 18], securityAdd: [5, 12], baggageAdd: [4, 10], painPoint: 'Mobile lounges slow; very spread out', typicalDriveTime: 45 },
-  { code: 'TPA', name: 'Tampa International', tier: 'MEDIUM', walk: [8, 14], curb: [4, 8], parking: [10, 18], rideshare: [5, 12], securityAdd: [2, 6], baggageAdd: [2, 6], painPoint: 'Well-designed; airsides via shuttle', typicalDriveTime: 20 },
-  { code: 'BWI', name: 'Baltimore-Washington', tier: 'MEDIUM', walk: [10, 18], curb: [5, 10], parking: [12, 22], rideshare: [6, 14], securityAdd: [3, 8], baggageAdd: [3, 8], painPoint: 'Southwest hub; can get crowded', typicalDriveTime: 25 },
-];
+// Top 100 US Airports → Tier mapping
+const AIRPORT_TIER_MAP: Record<string, AirportProfile['tier']> = {
+  // MEGA
+  ATL: 'MEGA', LAX: 'MEGA', ORD: 'MEGA', DFW: 'MEGA', DEN: 'MEGA', JFK: 'MEGA',
+  
+  // LARGE
+  CLT: 'LARGE', LAS: 'LARGE', MCO: 'LARGE', MIA: 'LARGE', PHX: 'LARGE', SEA: 'LARGE',
+  IAH: 'LARGE', EWR: 'LARGE', SFO: 'LARGE', BOS: 'LARGE', DTW: 'LARGE', MSP: 'LARGE',
+  LGA: 'LARGE', FLL: 'LARGE', BWI: 'LARGE', IAD: 'LARGE', SLC: 'LARGE', MDW: 'LARGE',
+  TPA: 'LARGE', SAN: 'LARGE', HNL: 'LARGE', PDX: 'LARGE', BNA: 'LARGE', AUS: 'LARGE',
+  RDU: 'LARGE',
+  
+  // MEDIUM
+  SJC: 'MEDIUM', MCI: 'MEDIUM', CLE: 'MEDIUM', SMF: 'MEDIUM', PIT: 'MEDIUM',
+  OAK: 'MEDIUM', CVG: 'MEDIUM', IND: 'MEDIUM', CMH: 'MEDIUM', HOU: 'MEDIUM',
+  MKE: 'MEDIUM', SAT: 'MEDIUM', DAL: 'MEDIUM', JAX: 'MEDIUM', RSW: 'MEDIUM',
+  ONT: 'MEDIUM', PBI: 'MEDIUM', MSY: 'MEDIUM', SNA: 'MEDIUM', BUR: 'MEDIUM',
+  RNO: 'MEDIUM', OGG: 'MEDIUM', SDF: 'MEDIUM', CHS: 'MEDIUM', PNS: 'MEDIUM',
+  
+  // GENERIC
+  TUS: 'GENERIC', OKC: 'GENERIC', ABQ: 'GENERIC', DSM: 'GENERIC', LGB: 'GENERIC',
+  GEG: 'GENERIC', ELP: 'GENERIC', TUL: 'GENERIC', BOI: 'GENERIC', RIC: 'GENERIC',
+  PSP: 'GENERIC', ORF: 'GENERIC', ALB: 'GENERIC', SAV: 'GENERIC', GSP: 'GENERIC',
+  ROC: 'GENERIC', BUF: 'GENERIC', OMA: 'GENERIC', SYR: 'GENERIC', BHM: 'GENERIC',
+  LIT: 'GENERIC', DAY: 'GENERIC', ICT: 'GENERIC', COS: 'GENERIC', PWM: 'GENERIC',
+};
+
+// Tier defaults
+export const TIER_DEFAULTS: Record<AirportProfile['tier'], Omit<AirportProfile, 'code' | 'name' | 'tier' | 'painPoint'>> = {
+  MEGA: {
+    walk: [15, 25],
+    curb: [20, 30],
+    parking: [20, 30],
+    rideshare: [25, 40],
+    securityAdd: [20, 30],
+    baggageAdd: [20, 30],
+    typicalDriveTime: 35,
+  },
+  LARGE: {
+    walk: [10, 20],
+    curb: [15, 25],
+    parking: [15, 25],
+    rideshare: [15, 30],
+    securityAdd: [15, 25],
+    baggageAdd: [15, 25],
+    typicalDriveTime: 25,
+  },
+  MEDIUM: {
+    walk: [8, 15],
+    curb: [10, 20],
+    parking: [10, 20],
+    rideshare: [10, 20],
+    securityAdd: [10, 20],
+    baggageAdd: [10, 20],
+    typicalDriveTime: 20,
+  },
+  GENERIC: {
+    walk: [5, 12],
+    curb: [5, 15],
+    parking: [5, 15],
+    rideshare: [5, 15],
+    securityAdd: [5, 15],
+    baggageAdd: [5, 15],
+    typicalDriveTime: 15,
+  },
+};
+
+// Airport-specific overrides (applied on top of tier defaults)
+const AIRPORT_OVERRIDES: Record<string, Partial<Pick<AirportProfile, 'curb' | 'rideshare' | 'securityAdd' | 'walk' | 'baggageAdd' | 'painPoint'>>> = {
+  LAX: {
+    curb: [25, 40],
+    rideshare: [30, 45],
+    painPoint: 'Curb and rideshare congestion dominate; security is rarely the bottleneck.',
+  },
+  JFK: {
+    curb: [25, 40],
+    rideshare: [30, 45],
+    securityAdd: [25, 35],
+    painPoint: 'Traffic variability and terminal differences make timing unreliable.',
+  },
+  EWR: {
+    curb: [25, 40],
+    rideshare: [30, 45],
+    securityAdd: [25, 35],
+    painPoint: 'Road access failures cause cascading delays.',
+  },
+  DEN: {
+    securityAdd: [25, 40],
+    walk: [20, 30],
+    painPoint: 'Early-morning security surges are severe and sudden.',
+  },
+  SEA: {
+    securityAdd: [25, 35],
+    painPoint: 'Security bottlenecks form abruptly with little warning.',
+  },
+  ATL: {
+    walk: [20, 30],
+    securityAdd: [20, 30],
+    painPoint: 'Train waits and sheer distance quietly add time.',
+  },
+  MCO: {
+    baggageAdd: [25, 35],
+    securityAdd: [25, 35],
+    painPoint: 'Family travel and checked bags compound delays.',
+  },
+  LAS: {
+    securityAdd: [20, 30],
+    painPoint: 'Convention peaks overwhelm security unpredictably.',
+  },
+  BOS: {
+    curb: [20, 30],
+    painPoint: 'Road layout becomes confusing under pressure.',
+  },
+  ORD: {
+    walk: [15, 30],
+    painPoint: 'Construction and terminal sprawl introduce hidden delays.',
+  },
+};
+
+// Airport name lookup
+const AIRPORT_NAMES: Record<string, string> = {
+  ATL: 'Atlanta Hartsfield-Jackson', LAX: 'Los Angeles International', ORD: "Chicago O'Hare",
+  DFW: 'Dallas/Fort Worth', DEN: 'Denver International', JFK: 'New York JFK',
+  CLT: 'Charlotte Douglas', LAS: 'Las Vegas Harry Reid', MCO: 'Orlando International',
+  MIA: 'Miami International', PHX: 'Phoenix Sky Harbor', SEA: 'Seattle-Tacoma',
+  IAH: 'Houston George Bush', EWR: 'Newark Liberty', SFO: 'San Francisco International',
+  BOS: 'Boston Logan', DTW: 'Detroit Metro', MSP: 'Minneapolis-St. Paul',
+  LGA: 'New York LaGuardia', FLL: 'Fort Lauderdale-Hollywood', BWI: 'Baltimore-Washington',
+  IAD: 'Washington Dulles', SLC: 'Salt Lake City', MDW: 'Chicago Midway',
+  TPA: 'Tampa International', SAN: 'San Diego International', HNL: 'Honolulu International',
+  PDX: 'Portland International', BNA: 'Nashville International', AUS: 'Austin-Bergstrom',
+  RDU: 'Raleigh-Durham', SJC: 'San Jose International', MCI: 'Kansas City International',
+  CLE: 'Cleveland Hopkins', SMF: 'Sacramento International', PIT: 'Pittsburgh International',
+  OAK: 'Oakland International', CVG: 'Cincinnati/Northern Kentucky', IND: 'Indianapolis International',
+  CMH: 'Columbus John Glenn', HOU: 'Houston Hobby', MKE: 'Milwaukee Mitchell',
+  SAT: 'San Antonio International', DAL: 'Dallas Love Field', JAX: 'Jacksonville International',
+  RSW: 'Fort Myers Southwest Florida', ONT: 'Ontario International', PBI: 'Palm Beach International',
+  MSY: 'New Orleans Louis Armstrong', SNA: 'Orange County John Wayne', BUR: 'Burbank Hollywood',
+  RNO: 'Reno-Tahoe', OGG: 'Maui Kahului', SDF: 'Louisville International',
+  CHS: 'Charleston International', PNS: 'Pensacola International', TUS: 'Tucson International',
+  OKC: 'Oklahoma City Will Rogers', ABQ: 'Albuquerque Sunport', DSM: 'Des Moines International',
+  LGB: 'Long Beach Airport', GEG: 'Spokane International', ELP: 'El Paso International',
+  TUL: 'Tulsa International', BOI: 'Boise Airport', RIC: 'Richmond International',
+  PSP: 'Palm Springs International', ORF: 'Norfolk International', ALB: 'Albany International',
+  SAV: 'Savannah/Hilton Head', GSP: 'Greenville-Spartanburg', ROC: 'Rochester Greater',
+  BUF: 'Buffalo Niagara', OMA: 'Omaha Eppley Airfield', SYR: 'Syracuse Hancock',
+  BHM: 'Birmingham-Shuttlesworth', LIT: 'Little Rock National', DAY: 'Dayton International',
+  ICT: 'Wichita Dwight D. Eisenhower', COS: 'Colorado Springs', PWM: 'Portland International Jetport',
+};
 
 // Special "Other" options that use tier defaults
 export const OTHER_AIRPORT_OPTIONS = [
@@ -46,73 +168,68 @@ export const OTHER_AIRPORT_OPTIONS = [
   { code: 'OTHER_REGIONAL', name: 'Other (Regional / Small)', tier: 'MEDIUM' as const },
 ];
 
-export const TIER_DEFAULTS: Record<AirportProfile['tier'], Omit<AirportProfile, 'code' | 'name' | 'tier' | 'painPoint'>> = {
-  GENERIC: {
-    walk: [10, 20],
-    curb: [5, 10],
-    parking: [15, 30],
-    rideshare: [6, 15],
-    securityAdd: [3, 10],
-    baggageAdd: [3, 10],
-    typicalDriveTime: 25,
-  },
-  MEDIUM: {
-    walk: [8, 16],
-    curb: [4, 8],
-    parking: [12, 22],
-    rideshare: [5, 12],
-    securityAdd: [2, 6],
-    baggageAdd: [2, 6],
-    typicalDriveTime: 20,
-  },
-  LARGE: {
-    walk: [10, 22],
-    curb: [5, 10],
-    parking: [15, 30],
-    rideshare: [6, 15],
-    securityAdd: [3, 10],
-    baggageAdd: [3, 10],
-    typicalDriveTime: 30,
-  },
-  MEGA: {
-    walk: [12, 28],
-    curb: [7, 14],
-    parking: [18, 35],
-    rideshare: [8, 20],
-    securityAdd: [5, 15],
-    baggageAdd: [5, 15],
-    typicalDriveTime: 35,
-  },
-};
+// Build airport profile from tier + overrides
+function buildAirportProfile(code: string): AirportProfile {
+  const tier = AIRPORT_TIER_MAP[code] || 'GENERIC';
+  const defaults = TIER_DEFAULTS[tier];
+  const overrides = AIRPORT_OVERRIDES[code] || {};
+  const name = AIRPORT_NAMES[code] || code;
+  
+  return {
+    code,
+    name,
+    tier,
+    walk: overrides.walk || defaults.walk as [number, number],
+    curb: overrides.curb || defaults.curb as [number, number],
+    parking: defaults.parking as [number, number],
+    rideshare: overrides.rideshare || defaults.rideshare as [number, number],
+    securityAdd: overrides.securityAdd || defaults.securityAdd as [number, number],
+    baggageAdd: overrides.baggageAdd || defaults.baggageAdd as [number, number],
+    painPoint: overrides.painPoint || '',
+    typicalDriveTime: defaults.typicalDriveTime,
+  };
+}
+
+// Get all known airports for the dropdown
+export function getAllAirports(): AirportProfile[] {
+  return Object.keys(AIRPORT_TIER_MAP).map(code => buildAirportProfile(code));
+}
 
 export function findAirport(query: string): AirportProfile | null {
   if (!query) return null;
   const normalized = query.toUpperCase().trim();
   
-  // Try exact IATA code match first
-  const exactMatch = TOP_25_AIRPORTS.find(a => a.code === normalized);
-  if (exactMatch) return exactMatch;
+  // Check if it's in the tier map
+  if (AIRPORT_TIER_MAP[normalized]) {
+    return buildAirportProfile(normalized);
+  }
   
   // Try partial name match
-  const nameMatch = TOP_25_AIRPORTS.find(a => 
-    a.name.toUpperCase().includes(normalized) || 
-    normalized.includes(a.code)
+  const nameMatch = Object.entries(AIRPORT_NAMES).find(([code, name]) => 
+    name.toUpperCase().includes(normalized) || normalized.includes(code)
   );
-  if (nameMatch) return nameMatch;
+  if (nameMatch) {
+    return buildAirportProfile(nameMatch[0]);
+  }
   
   return null;
 }
 
-export function inferAirportProfile(query: string, hasInternationalService: boolean = true): AirportProfile {
-  const tier: AirportProfile['tier'] = hasInternationalService ? 'LARGE' : 'MEDIUM';
-  const defaults = TIER_DEFAULTS[tier];
+export function inferAirportProfile(query: string): AirportProfile {
+  const defaults = TIER_DEFAULTS.GENERIC;
   
   return {
     code: query.toUpperCase().slice(0, 3) || 'UNK',
     name: query || 'Unknown Airport',
-    tier,
-    painPoint: 'Using estimated values based on airport size',
-    ...defaults,
+    tier: 'GENERIC',
+    painPoint: '',
+    walk: defaults.walk as [number, number],
+    curb: defaults.curb as [number, number],
+    parking: defaults.parking as [number, number],
+    rideshare: defaults.rideshare as [number, number],
+    securityAdd: defaults.securityAdd as [number, number],
+    baggageAdd: defaults.baggageAdd as [number, number],
+    typicalDriveTime: defaults.typicalDriveTime,
   };
 }
 
@@ -125,8 +242,14 @@ export function getAirportProfile(query: string): { profile: AirportProfile; isE
         code: 'OTH',
         name: 'Other Large Airport',
         tier: 'LARGE',
-        painPoint: 'Using estimates for large/international airports',
-        ...defaults,
+        painPoint: '',
+        walk: defaults.walk as [number, number],
+        curb: defaults.curb as [number, number],
+        parking: defaults.parking as [number, number],
+        rideshare: defaults.rideshare as [number, number],
+        securityAdd: defaults.securityAdd as [number, number],
+        baggageAdd: defaults.baggageAdd as [number, number],
+        typicalDriveTime: defaults.typicalDriveTime,
       },
       isEstimate: true,
     };
@@ -139,8 +262,14 @@ export function getAirportProfile(query: string): { profile: AirportProfile; isE
         code: 'REG',
         name: 'Regional Airport',
         tier: 'MEDIUM',
-        painPoint: 'Using estimates for regional airports',
-        ...defaults,
+        painPoint: '',
+        walk: defaults.walk as [number, number],
+        curb: defaults.curb as [number, number],
+        parking: defaults.parking as [number, number],
+        rideshare: defaults.rideshare as [number, number],
+        securityAdd: defaults.securityAdd as [number, number],
+        baggageAdd: defaults.baggageAdd as [number, number],
+        typicalDriveTime: defaults.typicalDriveTime,
       },
       isEstimate: true,
     };

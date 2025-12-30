@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FlightInputs } from '@/lib/timeline';
-import { TOP_25_AIRPORTS, OTHER_AIRPORT_OPTIONS, getAirportProfile } from '@/lib/airports';
+import { getAllAirports, OTHER_AIRPORT_OPTIONS, getAirportProfile } from '@/lib/airports';
 import { Button } from '@/components/ui/button';
 import { 
   Shield, 
@@ -116,9 +116,9 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
           <SelectContent className="bg-card border-border max-h-[300px]">
             <SelectGroup>
               <SelectLabel className="text-muted-foreground text-xs uppercase tracking-wider">
-                Top 25 US Airports
+                Top 100 US Airports
               </SelectLabel>
-              {TOP_25_AIRPORTS.map((a) => (
+              {getAllAirports().map((a) => (
                 <SelectItem 
                   key={a.code} 
                   value={a.code}
