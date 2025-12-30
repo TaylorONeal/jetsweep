@@ -31,12 +31,23 @@ interface FlightFormProps {
   onSubmit: (inputs: FlightInputs) => void;
 }
 
+// Helper to get default date/time (4 hours from now)
+function getDefaultDateTime() {
+  const defaultDate = new Date(Date.now() + 4 * 60 * 60 * 1000);
+  const dateStr = defaultDate.toISOString().split('T')[0];
+  const timeStr = defaultDate.toTimeString().slice(0, 5);
+  return { dateStr, timeStr };
+}
+
 export function FlightForm({ onSubmit }: FlightFormProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   
+  // Initialize with defaults (4 hours from now)
+  const defaults = getDefaultDateTime();
+  
   // Form state
-  const [departureDate, setDepartureDate] = useState('');
-  const [departureTime, setDepartureTime] = useState('');
+  const [departureDate, setDepartureDate] = useState(defaults.dateStr);
+  const [departureTime, setDepartureTime] = useState(defaults.timeStr);
   const [tripType, setTripType] = useState<'domestic' | 'international'>('domestic');
   const [hasPreCheck, setHasPreCheck] = useState(false);
   const [hasClear, setHasClear] = useState(false);
@@ -65,17 +76,11 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
     
     if (!airport) return;
 
-    // Use current date/time if not specified
-    let departureDateTime: Date;
-    if (departureDate && departureTime) {
-      departureDateTime = new Date(`${departureDate}T${departureTime}`);
-    } else if (departureDate) {
-      // If only date, assume noon
-      departureDateTime = new Date(`${departureDate}T12:00`);
-    } else {
-      // If nothing specified, assume 4 hours from now
-      departureDateTime = new Date(Date.now() + 4 * 60 * 60 * 1000);
-    }
+    // Build departure date/time from inputs
+    const today = new Date().toISOString().split('T')[0];
+    const finalDate = departureDate || today;
+    const finalTime = departureTime || '12:00';
+    const departureDateTime = new Date(`${finalDate}T${finalTime}`);
     
     onSubmit({
       departureDateTime,
@@ -348,7 +353,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
           </div>
         </div>
         <p className="text-xs text-muted-foreground">
-          Leave blank to calculate for a flight 4 hours from now.
+          Pre-filled for 4 hours from now. Adjust as needed.
         </p>
       </section>
 
