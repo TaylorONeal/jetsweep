@@ -39,6 +39,12 @@ export const TOP_25_AIRPORTS: AirportProfile[] = [
   { code: 'BWI', name: 'Baltimore-Washington', tier: 'MEDIUM', walk: [10, 18], curb: [5, 10], parking: [12, 22], rideshare: [6, 14], securityAdd: [3, 8], baggageAdd: [3, 8], painPoint: 'Southwest hub; can get crowded' },
 ];
 
+// Special "Other" options that use tier defaults
+export const OTHER_AIRPORT_OPTIONS = [
+  { code: 'OTHER_LARGE', name: 'Other (Large / International)', tier: 'LARGE' as const },
+  { code: 'OTHER_REGIONAL', name: 'Other (Regional / Small)', tier: 'MEDIUM' as const },
+];
+
 export const TIER_DEFAULTS: Record<AirportProfile['tier'], Omit<AirportProfile, 'code' | 'name' | 'tier' | 'painPoint'>> = {
   GENERIC: {
     walk: [10, 20],
@@ -106,6 +112,35 @@ export function inferAirportProfile(query: string, hasInternationalService: bool
 }
 
 export function getAirportProfile(query: string): { profile: AirportProfile; isEstimate: boolean } {
+  // Handle special "Other" options
+  if (query === 'OTHER_LARGE') {
+    const defaults = TIER_DEFAULTS.LARGE;
+    return {
+      profile: {
+        code: 'OTH',
+        name: 'Other Large Airport',
+        tier: 'LARGE',
+        painPoint: 'Using estimates for large/international airports',
+        ...defaults,
+      },
+      isEstimate: true,
+    };
+  }
+  
+  if (query === 'OTHER_REGIONAL') {
+    const defaults = TIER_DEFAULTS.MEDIUM;
+    return {
+      profile: {
+        code: 'REG',
+        name: 'Regional Airport',
+        tier: 'MEDIUM',
+        painPoint: 'Using estimates for regional airports',
+        ...defaults,
+      },
+      isEstimate: true,
+    };
+  }
+
   const found = findAirport(query);
   if (found) {
     return { profile: found, isEstimate: false };

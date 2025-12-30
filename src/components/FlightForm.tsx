@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { FlightInputs } from '@/lib/timeline';
-import { TOP_25_AIRPORTS } from '@/lib/airports';
+import { TOP_25_AIRPORTS, OTHER_AIRPORT_OPTIONS } from '@/lib/airports';
 import { Button } from '@/components/ui/button';
 import { 
-  Plane, 
   Shield, 
   Luggage, 
   Users, 
@@ -12,8 +11,20 @@ import {
   PartyPopper,
   ChevronDown,
   ChevronUp,
-  Sparkles
+  Sparkles,
+  MapPin,
+  Calendar,
+  Clock
 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup,
+  SelectLabel,
+} from '@/components/ui/select';
 
 interface FlightFormProps {
   onSubmit: (inputs: FlightInputs) => void;
@@ -38,9 +49,19 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!departureDate || !departureTime) return;
+    if (!airport) return;
 
-    const departureDateTime = new Date(`${departureDate}T${departureTime}`);
+    // Use current date/time if not specified
+    let departureDateTime: Date;
+    if (departureDate && departureTime) {
+      departureDateTime = new Date(`${departureDate}T${departureTime}`);
+    } else if (departureDate) {
+      // If only date, assume noon
+      departureDateTime = new Date(`${departureDate}T12:00`);
+    } else {
+      // If nothing specified, assume 2 hours from now
+      departureDateTime = new Date(Date.now() + 2 * 60 * 60 * 1000);
+    }
     
     onSubmit({
       departureDateTime,
@@ -56,95 +77,86 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
     });
   };
 
-  const isValid = departureDate && departureTime;
+  const isValid = airport;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Flight Details Section */}
+      {/* Airport Selection - Primary */}
       <section className="space-y-4">
         <h2 className="deco-header text-sm text-primary tracking-widest flex items-center gap-2">
-          <Plane className="w-4 h-4" />
-          Flight Details
+          <MapPin className="w-4 h-4" />
+          Airport
         </h2>
         
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider">
-              Date
-            </label>
-            <input
-              type="date"
-              value={departureDate}
-              onChange={(e) => setDepartureDate(e.target.value)}
-              className="input-field w-full"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider">
-              Departure
-            </label>
-            <input
-              type="time"
-              value={departureTime}
-              onChange={(e) => setDepartureTime(e.target.value)}
-              className="input-field w-full"
-              required
-            />
-          </div>
-        </div>
+        <Select value={airport} onValueChange={setAirport}>
+          <SelectTrigger className="w-full input-field h-auto py-3">
+            <SelectValue placeholder="Select your airport" />
+          </SelectTrigger>
+          <SelectContent className="bg-card border-border max-h-[300px]">
+            <SelectGroup>
+              <SelectLabel className="text-muted-foreground text-xs uppercase tracking-wider">
+                Top 25 US Airports
+              </SelectLabel>
+              {TOP_25_AIRPORTS.map((a) => (
+                <SelectItem 
+                  key={a.code} 
+                  value={a.code}
+                  className="cursor-pointer"
+                >
+                  <span className="font-mono text-primary mr-2">{a.code}</span>
+                  <span className="text-foreground">{a.name}</span>
+                </SelectItem>
+              ))}
+            </SelectGroup>
+            <SelectGroup>
+              <SelectLabel className="text-muted-foreground text-xs uppercase tracking-wider mt-2">
+                Other Airports
+              </SelectLabel>
+              {OTHER_AIRPORT_OPTIONS.map((a) => (
+                <SelectItem 
+                  key={a.code} 
+                  value={a.code}
+                  className="cursor-pointer"
+                >
+                  <span className="text-foreground">{a.name}</span>
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </section>
 
-        {/* Trip type toggle */}
-        <div>
-          <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider">
-            Trip Type
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setTripType('domestic')}
-              className={`py-3 px-4 rounded-lg border text-sm font-medium transition-all
-                ${tripType === 'domestic' 
-                  ? 'bg-primary/20 border-primary text-primary' 
-                  : 'bg-secondary border-border text-muted-foreground hover:text-foreground'
-                }`}
-            >
-              Domestic
-            </button>
-            <button
-              type="button"
-              onClick={() => setTripType('international')}
-              className={`py-3 px-4 rounded-lg border text-sm font-medium transition-all
-                ${tripType === 'international' 
-                  ? 'bg-primary/20 border-primary text-primary' 
-                  : 'bg-secondary border-border text-muted-foreground hover:text-foreground'
-                }`}
-            >
-              International
-            </button>
-          </div>
-        </div>
+      <div className="deco-divider" />
 
-        {/* Airport */}
-        <div>
-          <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider">
-            Airport (optional)
-          </label>
-          <input
-            type="text"
-            value={airport}
-            onChange={(e) => setAirport(e.target.value)}
-            placeholder="e.g., LAX or Los Angeles"
-            className="input-field w-full"
-            list="airports"
-          />
-          <datalist id="airports">
-            {TOP_25_AIRPORTS.map((a) => (
-              <option key={a.code} value={a.code}>
-                {a.name}
-              </option>
-            ))}
-          </datalist>
+      {/* Trip Type */}
+      <section className="space-y-4">
+        <h2 className="deco-header text-sm text-primary tracking-widest">
+          Trip Type
+        </h2>
+        
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => setTripType('domestic')}
+            className={`py-3 px-4 rounded-lg border text-sm font-medium transition-all
+              ${tripType === 'domestic' 
+                ? 'bg-primary/20 border-primary text-primary' 
+                : 'bg-secondary border-border text-muted-foreground hover:text-foreground'
+              }`}
+          >
+            Domestic
+          </button>
+          <button
+            type="button"
+            onClick={() => setTripType('international')}
+            className={`py-3 px-4 rounded-lg border text-sm font-medium transition-all
+              ${tripType === 'international' 
+                ? 'bg-primary/20 border-primary text-primary' 
+                : 'bg-secondary border-border text-muted-foreground hover:text-foreground'
+              }`}
+          >
+            International
+          </button>
         </div>
       </section>
 
@@ -213,6 +225,44 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
 
       {showAdvanced && (
         <div className="space-y-6 animate-fade-in">
+          {/* Flight Date/Time - Optional */}
+          <section className="space-y-4">
+            <h2 className="deco-header text-sm text-primary tracking-widest flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Flight Time
+              <span className="text-muted-foreground text-xs normal-case tracking-normal">(optional)</span>
+            </h2>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  value={departureDate}
+                  onChange={(e) => setDepartureDate(e.target.value)}
+                  className="input-field w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  Departure
+                </label>
+                <input
+                  type="time"
+                  value={departureTime}
+                  onChange={(e) => setDepartureTime(e.target.value)}
+                  className="input-field w-full"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Leave blank to calculate for a flight 2 hours from now.
+            </p>
+          </section>
+
           {/* Group & Transport */}
           <section className="space-y-4">
             <h2 className="deco-header text-sm text-primary tracking-widest flex items-center gap-2">
@@ -324,7 +374,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
         className="w-full mt-6"
       >
         <Sparkles className="w-5 h-5" />
-        Calculate Timeline
+        Show me when to leave
       </Button>
     </form>
   );
