@@ -1,18 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FlightForm } from '@/components/FlightForm';
 import { Timeline } from '@/components/Timeline';
 import { FlightInputs, TimelineResult, computeTimeline } from '@/lib/timeline';
 import { LandingHero } from '@/components/LandingHero';
+import { getRecentSearches, saveRecentSearch, RecentSearch } from '@/lib/recentSearches';
+import { getAirportProfile } from '@/lib/airports';
 
 const Index = () => {
   const [result, setResult] = useState<TimelineResult | null>(null);
   const [flightTime, setFlightTime] = useState<Date | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
+
+  // Load recent searches on mount
+  useEffect(() => {
+    setRecentSearches(getRecentSearches());
+  }, []);
 
   const handleSubmit = (inputs: FlightInputs) => {
     const timeline = computeTimeline(inputs);
     setResult(timeline);
     setFlightTime(inputs.departureDateTime);
+
+    // Save to recent searches
+    if (inputs.airport) {
+      const { profile } = getAirportProfile(inputs.airport);
+      saveRecentSearch({
+        airport: inputs.airport,
+        airportName: profile.name,
+        tripType: inputs.tripType,
+        leaveTime: timeline.leaveTime.toISOString(),
+        flightTime: inputs.departureDateTime.toISOString(),
+      });
+      setRecentSearches(getRecentSearches());
+    }
   };
 
   const handleBack = () => {
@@ -28,6 +49,25 @@ const Index = () => {
 
   const handleStartFlow = () => {
     setShowForm(true);
+  };
+
+  const handleQuickSearch = (search: RecentSearch) => {
+    // Create a quick calculation with defaults from the recent search
+    const departureDateTime = new Date(Date.now() + 2 * 60 * 60 * 1000);
+    const inputs: FlightInputs = {
+      departureDateTime,
+      tripType: search.tripType,
+      hasPreCheck: false,
+      hasClear: false,
+      hasCheckedBag: false,
+      airport: search.airport,
+      groupType: 'solo',
+      transportType: 'rideshare',
+      isHoliday: false,
+      isBadWeather: false,
+      riskPreference: 'balanced',
+    };
+    handleSubmit(inputs);
   };
 
   // Show timeline results
@@ -73,7 +113,13 @@ const Index = () => {
   }
 
   // Show landing hero
-  return <LandingHero onStart={handleStartFlow} />;
+  return (
+    <LandingHero 
+      onStart={handleStartFlow} 
+      recentSearches={recentSearches}
+      onQuickSearch={handleQuickSearch}
+    />
+  );
 };
 
 export default Index;

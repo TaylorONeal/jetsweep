@@ -1,4 +1,5 @@
 import { getAirportProfile, AirportProfile, TIER_DEFAULTS } from './airports';
+import { analyzeTravelConditions, TravelConditions } from './travelConditions';
 
 export interface FlightInputs {
   departureDateTime: Date;
@@ -9,7 +10,7 @@ export interface FlightInputs {
   airport?: string;
   groupType: 'solo' | 'family';
   transportType: 'rideshare' | 'car';
-  isHoliday: boolean;
+  isHoliday: boolean; // Manual override
   isBadWeather: boolean;
   riskPreference: 'early' | 'balanced' | 'risky';
   driveTime?: number; // Minutes from home to airport
@@ -39,6 +40,7 @@ export interface TimelineResult {
   airportProfile: AirportProfile;
   isAirportEstimate: boolean;
   isLeaveNow: boolean;
+  travelConditions: TravelConditions;
 }
 
 function addRange(a: TimeRange, b: TimeRange): TimeRange {
@@ -86,7 +88,7 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     airport,
     groupType,
     transportType,
-    isHoliday,
+    isHoliday: manualHoliday,
     isBadWeather,
     riskPreference,
     driveTime,
@@ -95,6 +97,12 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
   const isInternational = tripType === 'international';
   const isFamily = groupType === 'family';
   const isRideshare = transportType === 'rideshare';
+
+  // Analyze travel conditions (rush hour, holidays)
+  const travelConditions = analyzeTravelConditions(departureDateTime);
+  
+  // Holiday is true if auto-detected OR manually set
+  const isHoliday = manualHoliday || travelConditions.holidayImpact !== null;
 
   // Risk multiplier affects buffer times
   // early = use max times (1.0), balanced = use ~75% (0.75), risky = use min times (0.5)
@@ -105,10 +113,11 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     ? getAirportProfile(airport)
     : { profile: { ...TIER_DEFAULTS.GENERIC, code: 'GEN', name: 'Generic Airport', tier: 'GENERIC' as const, painPoint: 'Using default estimates' }, isEstimate: true };
 
-  // Calculate confidence
-  const modifierCount = [isHoliday, isBadWeather, isFamily].filter(Boolean).length;
+  // Calculate confidence - include holiday impact severity
+  const holidaySevere = travelConditions.holidayImpact?.severity === 'extreme' || travelConditions.holidayImpact?.severity === 'heavy';
+  const modifierCount = [isHoliday, isBadWeather, isFamily, travelConditions.isRushHour].filter(Boolean).length;
   let confidence: TimelineResult['confidence'] = 'normal';
-  if (modifierCount >= 2 || (isRideshare && isBadWeather)) {
+  if (modifierCount >= 2 || (isRideshare && isBadWeather) || holidaySevere) {
     confidence = 'high-variance';
   } else if (modifierCount === 1) {
     confidence = 'risky';
@@ -174,9 +183,17 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     max: airportProfile.securityAdd[1] 
   });
 
+  // Apply holiday security multiplier if auto-detected
+  if (travelConditions.holidayImpact && travelConditions.securityMultiplier !== 1.0) {
+    securityBase = {
+      min: Math.round(securityBase.min * travelConditions.securityMultiplier),
+      max: Math.round(securityBase.max * travelConditions.securityMultiplier),
+    };
+  }
+
   const securityRange = applyModifiers(
     securityBase,
-    isHoliday,
+    manualHoliday && !travelConditions.holidayImpact, // Only apply manual holiday modifier if not auto-detected
     false, // weather doesn't affect security
     isFamily,
     { min: 10, max: 20 },
@@ -316,10 +333,15 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       note: 'Open app and request ride; have address ready',
     });
 
-    // Drive time to airport
-    const actualDriveTime = driveTime ?? airportProfile.typicalDriveTime;
+    // Drive time to airport (apply rush hour multiplier)
+    const baseDriveTime = driveTime ?? airportProfile.typicalDriveTime;
+    const actualDriveTime = Math.round(baseDriveTime * travelConditions.trafficMultiplier);
     const driveEnd = callStart;
     const driveStart = subtractMinutes(driveEnd, actualDriveTime);
+
+    const rushHourNote = travelConditions.isRushHour 
+      ? ` (${travelConditions.rushHourSeverity === 'heavy' ? '+35%' : '+15%'} rush hour traffic)`
+      : '';
 
     stages.unshift({
       id: 'drive',
@@ -329,8 +351,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       endTime: driveEnd,
       durationRange: { min: actualDriveTime, max: actualDriveTime },
       note: driveTime 
-        ? 'Your estimated drive time' 
-        : `Typical ${actualDriveTime} min from city center—check Google/Apple Maps for your route`,
+        ? `Your estimated drive time${rushHourNote}` 
+        : `Typical ${baseDriveTime} min from city center${rushHourNote}—check Google/Apple Maps for your route`,
     });
   } else {
     // Personal car
@@ -363,10 +385,15 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       note: 'Find parking, take shuttle or walk to terminal',
     });
 
-    // Drive time to airport
-    const actualDriveTime = driveTime ?? airportProfile.typicalDriveTime;
+    // Drive time to airport (apply rush hour multiplier)
+    const baseDriveTime = driveTime ?? airportProfile.typicalDriveTime;
+    const actualDriveTime = Math.round(baseDriveTime * travelConditions.trafficMultiplier);
     const driveEnd = parkingStart;
     const driveStart = subtractMinutes(driveEnd, actualDriveTime);
+
+    const rushHourNote = travelConditions.isRushHour 
+      ? ` (${travelConditions.rushHourSeverity === 'heavy' ? '+35%' : '+15%'} rush hour traffic)`
+      : '';
 
     stages.unshift({
       id: 'drive',
@@ -376,8 +403,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       endTime: driveEnd,
       durationRange: { min: actualDriveTime, max: actualDriveTime },
       note: driveTime 
-        ? 'Your estimated drive time' 
-        : `Typical ${actualDriveTime} min from city center—check Google/Apple Maps for your route`,
+        ? `Your estimated drive time${rushHourNote}` 
+        : `Typical ${baseDriveTime} min from city center${rushHourNote}—check Google/Apple Maps for your route`,
     });
 
     // Head to car
@@ -411,6 +438,7 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     airportProfile,
     isAirportEstimate,
     isLeaveNow,
+    travelConditions,
   };
 }
 
