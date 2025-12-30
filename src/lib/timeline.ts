@@ -285,7 +285,29 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
 
   // Transport
   if (isRideshare) {
-    // Rideshare pickup
+    // Drive time to airport (rideshare drives you)
+    const baseDriveTime = driveTime ?? airportProfile.typicalDriveTime;
+    const actualDriveTime = Math.round(baseDriveTime * travelConditions.trafficMultiplier);
+    const driveEnd = arrivalStart;
+    const driveStart = subtractMinutes(driveEnd, actualDriveTime);
+
+    const rushHourNote = travelConditions.isRushHour 
+      ? ` (${travelConditions.rushHourSeverity === 'heavy' ? '+35%' : '+15%'} rush hour traffic)`
+      : '';
+
+    stages.unshift({
+      id: 'drive',
+      label: 'Drive to Airport',
+      icon: 'navigation',
+      startTime: driveStart,
+      endTime: driveEnd,
+      durationRange: { min: actualDriveTime, max: actualDriveTime },
+      note: driveTime 
+        ? `Your estimated drive time${rushHourNote}` 
+        : `Typical ${baseDriveTime} min from city center${rushHourNote}—check Google/Apple Maps for your route`,
+    });
+
+    // Rideshare pickup (wait for driver)
     const pickupBase: TimeRange = { min: 8, max: 15 };
     const pickupAirportAdd: TimeRange = {
       min: airportProfile.rideshare[0] - 6,
@@ -301,7 +323,7 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       { min: 0, max: 0 }
     );
 
-    const pickupEnd = arrivalStart;
+    const pickupEnd = driveStart;
     const pickupTime = getRiskAdjustedTime(pickupRange, riskMultiplier);
     const pickupStart = subtractMinutes(pickupEnd, pickupTime);
 
@@ -331,28 +353,6 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       endTime: callEnd,
       durationRange: callRange,
       note: 'Open app and request ride; have address ready',
-    });
-
-    // Drive time to airport (apply rush hour multiplier)
-    const baseDriveTime = driveTime ?? airportProfile.typicalDriveTime;
-    const actualDriveTime = Math.round(baseDriveTime * travelConditions.trafficMultiplier);
-    const driveEnd = callStart;
-    const driveStart = subtractMinutes(driveEnd, actualDriveTime);
-
-    const rushHourNote = travelConditions.isRushHour 
-      ? ` (${travelConditions.rushHourSeverity === 'heavy' ? '+35%' : '+15%'} rush hour traffic)`
-      : '';
-
-    stages.unshift({
-      id: 'drive',
-      label: 'Drive to Airport',
-      icon: 'navigation',
-      startTime: driveStart,
-      endTime: driveEnd,
-      durationRange: { min: actualDriveTime, max: actualDriveTime },
-      note: driveTime 
-        ? `Your estimated drive time${rushHourNote}` 
-        : `Typical ${baseDriveTime} min from city center${rushHourNote}—check Google/Apple Maps for your route`,
     });
   } else {
     // Personal car
