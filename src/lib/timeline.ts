@@ -12,6 +12,7 @@ export interface FlightInputs {
   isHoliday: boolean;
   isBadWeather: boolean;
   riskPreference: 'early' | 'balanced' | 'risky';
+  driveTime?: number; // Minutes from home to airport
 }
 
 export interface TimeRange {
@@ -88,6 +89,7 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     isHoliday,
     isBadWeather,
     riskPreference,
+    driveTime,
   } = inputs;
 
   const isInternational = tripType === 'international';
@@ -313,6 +315,23 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       durationRange: callRange,
       note: 'Open app and request ride; have address ready',
     });
+
+    // Drive time to airport
+    const actualDriveTime = driveTime ?? airportProfile.typicalDriveTime;
+    const driveEnd = callStart;
+    const driveStart = subtractMinutes(driveEnd, actualDriveTime);
+
+    stages.unshift({
+      id: 'drive',
+      label: 'Drive to Airport',
+      icon: 'navigation',
+      startTime: driveStart,
+      endTime: driveEnd,
+      durationRange: { min: actualDriveTime, max: actualDriveTime },
+      note: driveTime 
+        ? 'Your estimated drive time' 
+        : `Typical ${actualDriveTime} min from city center—check Google/Apple Maps for your route`,
+    });
   } else {
     // Personal car
     const parkingBase: TimeRange = { min: 15, max: 30 };
@@ -344,6 +363,23 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       note: 'Find parking, take shuttle or walk to terminal',
     });
 
+    // Drive time to airport
+    const actualDriveTime = driveTime ?? airportProfile.typicalDriveTime;
+    const driveEnd = parkingStart;
+    const driveStart = subtractMinutes(driveEnd, actualDriveTime);
+
+    stages.unshift({
+      id: 'drive',
+      label: 'Drive to Airport',
+      icon: 'navigation',
+      startTime: driveStart,
+      endTime: driveEnd,
+      durationRange: { min: actualDriveTime, max: actualDriveTime },
+      note: driveTime 
+        ? 'Your estimated drive time' 
+        : `Typical ${actualDriveTime} min from city center—check Google/Apple Maps for your route`,
+    });
+
     // Head to car
     const headToCarRange: TimeRange = { min: 3, max: 5 };
     const headToCarTime = getRiskAdjustedTime(headToCarRange, riskMultiplier);
@@ -351,8 +387,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       id: 'leave',
       label: 'Head to Car',
       icon: 'home',
-      startTime: subtractMinutes(parkingStart, headToCarTime),
-      endTime: parkingStart,
+      startTime: subtractMinutes(driveStart, headToCarTime),
+      endTime: driveStart,
       durationRange: headToCarRange,
       note: 'Final check: ID, phone, charger, bags',
     });

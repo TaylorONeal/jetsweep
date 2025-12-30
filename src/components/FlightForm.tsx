@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FlightInputs } from '@/lib/timeline';
-import { TOP_25_AIRPORTS, OTHER_AIRPORT_OPTIONS } from '@/lib/airports';
+import { TOP_25_AIRPORTS, OTHER_AIRPORT_OPTIONS, getAirportProfile } from '@/lib/airports';
 import { Button } from '@/components/ui/button';
 import { 
   Shield, 
@@ -14,7 +14,8 @@ import {
   Sparkles,
   MapPin,
   Calendar,
-  Clock
+  Clock,
+  Navigation
 } from 'lucide-react';
 import {
   Select,
@@ -46,6 +47,20 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
   const [riskPreference, setRiskPreference] = useState<'early' | 'balanced' | 'risky'>('balanced');
   const [isHoliday, setIsHoliday] = useState(false);
   const [isBadWeather, setIsBadWeather] = useState(false);
+  const [driveTime, setDriveTime] = useState<string>('');
+  const [defaultDriveTime, setDefaultDriveTime] = useState<number>(25);
+
+  // Update default drive time when airport changes
+  useEffect(() => {
+    if (airport) {
+      const { profile } = getAirportProfile(airport);
+      setDefaultDriveTime(profile.typicalDriveTime);
+      // Only set if user hasn't entered a custom value
+      if (!driveTime) {
+        setDriveTime(profile.typicalDriveTime.toString());
+      }
+    }
+  }, [airport]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +91,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
       riskPreference,
       isHoliday,
       isBadWeather,
+      driveTime: driveTime ? parseInt(driveTime, 10) : undefined,
     });
   };
 
@@ -126,6 +142,46 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
             </SelectGroup>
           </SelectContent>
         </Select>
+      </section>
+
+      {/* Drive Time */}
+      <section className="space-y-3">
+        <h2 className="deco-header text-sm text-primary tracking-widest flex items-center gap-2">
+          <Navigation className="w-4 h-4" />
+          Drive Time to Airport
+        </h2>
+        
+        <div className="flex items-center gap-3">
+          <div className="flex-1">
+            <div className="relative">
+              <input
+                type="number"
+                min="1"
+                max="180"
+                value={driveTime}
+                onChange={(e) => setDriveTime(e.target.value)}
+                placeholder={defaultDriveTime.toString()}
+                className="input-field w-full pr-12"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                min
+              </span>
+            </div>
+          </div>
+          {driveTime && parseInt(driveTime) !== defaultDriveTime && (
+            <button
+              type="button"
+              onClick={() => setDriveTime(defaultDriveTime.toString())}
+              className="text-xs text-muted-foreground hover:text-foreground underline"
+            >
+              Reset to {defaultDriveTime}
+            </button>
+          )}
+        </div>
+        
+        <p className="text-xs text-muted-foreground">
+          💡 Check <span className="text-foreground">Google Maps</span> or <span className="text-foreground">Apple Maps</span> for your actual drive time from home.
+        </p>
       </section>
 
       <div className="deco-divider" />
