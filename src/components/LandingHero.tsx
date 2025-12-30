@@ -1,18 +1,29 @@
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plane } from 'lucide-react';
+import { Plane, Clock, History } from 'lucide-react';
+import { RecentSearch, formatRecentSearchTime } from '@/lib/recentSearches';
+import { getAirportProfile } from '@/lib/airports';
 
 interface LandingHeroProps {
   onStart: () => void;
+  recentSearches?: RecentSearch[];
+  onQuickSearch?: (search: RecentSearch) => void;
 }
 
-export function LandingHero({ onStart }: LandingHeroProps) {
+export function LandingHero({ onStart, recentSearches = [], onQuickSearch }: LandingHeroProps) {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* App name - top, small but confident */}
-      <header className="pt-12 px-6">
+      <header className="pt-12 px-6 flex items-center justify-between">
         <p className="text-muted-foreground text-sm font-medium tracking-widest uppercase">
           JetSweep
         </p>
+        <Link 
+          to="/about" 
+          className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+        >
+          About
+        </Link>
       </header>
 
       {/* Main content - centered vertically */}
@@ -48,6 +59,37 @@ export function LandingHero({ onStart }: LandingHeroProps) {
           >
             Show me when to leave
           </Button>
+
+          {/* Recent searches */}
+          {recentSearches.length > 0 && (
+            <div className="mt-8">
+              <div className="flex items-center gap-2 mb-3">
+                <History className="w-4 h-4 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground uppercase tracking-wider">Recent</span>
+              </div>
+              <div className="space-y-2">
+                {recentSearches.slice(0, 3).map((search) => {
+                  const { profile } = getAirportProfile(search.airport);
+                  return (
+                    <button
+                      key={search.id}
+                      onClick={() => onQuickSearch?.(search)}
+                      className="w-full flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-border hover:bg-secondary transition-colors text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="font-mono text-primary text-sm">{search.airport}</span>
+                        <span className="text-foreground text-sm">{search.tripType}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                        <Clock className="w-3 h-3" />
+                        {formatRecentSearchTime(search.createdAt)}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
