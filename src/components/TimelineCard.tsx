@@ -1,4 +1,5 @@
 import { TimelineStage, formatTime } from '@/lib/timeline';
+import { HeadsUpCallout } from './HeadsUpCallout';
 import { 
   Plane, 
   DoorOpen, 
@@ -8,7 +9,8 @@ import {
   Car, 
   Smartphone,
   Home,
-  Clock
+  Clock,
+  Navigation
 } from 'lucide-react';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -20,6 +22,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   car: Car,
   smartphone: Smartphone,
   home: Home,
+  navigation: Navigation,
 };
 
 interface TimelineCardProps {
@@ -27,9 +30,10 @@ interface TimelineCardProps {
   index: number;
   isFirst: boolean;
   isLast: boolean;
+  painPoint?: string;
 }
 
-export function TimelineCard({ stage, index, isFirst, isLast }: TimelineCardProps) {
+export function TimelineCard({ stage, index, isFirst, isLast, painPoint }: TimelineCardProps) {
   const Icon = iconMap[stage.icon] || Clock;
   
   return (
@@ -91,6 +95,13 @@ export function TimelineCard({ stage, index, isFirst, isLast }: TimelineCardProp
             {stage.note}
           </p>
         </div>
+
+        {/* Inline pain point callout for this stage */}
+        {painPoint && (
+          <div className="mt-3">
+            <HeadsUpCallout message={painPoint} />
+          </div>
+        )}
       </div>
     </div>
   );
