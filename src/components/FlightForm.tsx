@@ -65,7 +65,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
   const [hasCheckedBag, setHasCheckedBag] = useState(false);
   const [airport, setAirport] = useState('');
   const [groupType, setGroupType] = useState<'solo' | 'family'>('solo');
-  const [transportType, setTransportType] = useState<'rideshare' | 'car'>('rideshare');
+  const [useRideshare, setUseRideshare] = useState(true);
   const [riskPreference, setRiskPreference] = useState<'early' | 'balanced' | 'risky'>('balanced');
   const [isHoliday, setIsHoliday] = useState(false);
   const [isBadWeather, setIsBadWeather] = useState(false);
@@ -111,7 +111,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
       hasCheckedBag,
       airport: airport || undefined,
       groupType,
-      transportType,
+      transportType: useRideshare ? 'rideshare' : 'car',
       riskPreference,
       isHoliday,
       isBadWeather,
@@ -466,30 +466,18 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
               Transportation
             </h2>
             
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setTransportType('rideshare')}
-                className={`py-3 px-4 rounded-lg border text-sm font-medium transition-all
-                  ${transportType === 'rideshare' 
-                    ? 'bg-primary/20 border-primary text-primary' 
-                    : 'bg-secondary border-border text-muted-foreground hover:text-foreground'
-                  }`}
-              >
-                Rideshare
-              </button>
-              <button
-                type="button"
-                onClick={() => setTransportType('car')}
-                className={`py-3 px-4 rounded-lg border text-sm font-medium transition-all
-                  ${transportType === 'car' 
-                    ? 'bg-primary/20 border-primary text-primary' 
-                    : 'bg-secondary border-border text-muted-foreground hover:text-foreground'
-                  }`}
-              >
-                Personal Car
-              </button>
-            </div>
+            <label className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 border border-border cursor-pointer hover:bg-secondary transition-colors">
+              <input
+                type="checkbox"
+                checked={useRideshare}
+                onChange={(e) => setUseRideshare(e.target.checked)}
+                className="checkbox-deco"
+              />
+              <div>
+                <span className="text-foreground font-medium">Using Rideshare</span>
+                <p className="text-xs text-muted-foreground">Uber, Lyft, etc. (includes wait time)</p>
+              </div>
+            </label>
           </section>
 
           {/* Risk Modifiers */}

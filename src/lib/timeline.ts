@@ -360,40 +360,11 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       note: 'Open app and request ride; have address ready',
     });
   } else {
-    // Personal car
-    const parkingBase: TimeRange = { min: 15, max: 30 };
-    const parkingAirportAdd: TimeRange = {
-      min: airportProfile.parking[0] - 15,
-      max: airportProfile.parking[1] - 15,
-    };
-    const parkingRange = applyModifiers(
-      addRange(parkingBase, { min: Math.max(0, parkingAirportAdd.min), max: Math.max(0, parkingAirportAdd.max) }),
-      isHoliday,
-      isBadWeather,
-      false,
-      { min: 5, max: 15 },
-      { min: 10, max: 25 },
-      { min: 0, max: 0 }
-    );
-
-    const parkingEnd = arrivalStart;
-    const parkingTime = getRiskAdjustedTime(parkingRange, riskMultiplier);
-    const parkingStart = subtractMinutes(parkingEnd, parkingTime);
-
-    stages.unshift({
-      id: 'parking',
-      label: 'Park & Shuttle',
-      icon: 'car',
-      startTime: parkingStart,
-      endTime: parkingEnd,
-      durationRange: parkingRange,
-      note: 'Find parking, take shuttle or walk to terminal',
-    });
-
+    // Personal car - simpler path, just drive (drop-off or someone else driving)
     // Drive time to airport (apply rush hour multiplier)
     const baseDriveTime = driveTime ?? airportProfile.typicalDriveTime;
     const actualDriveTime = Math.round(baseDriveTime * travelConditions.trafficMultiplier);
-    const driveEnd = parkingStart;
+    const driveEnd = arrivalStart;
     const driveStart = subtractMinutes(driveEnd, actualDriveTime);
 
     const rushHourNote = travelConditions.isRushHour 
@@ -410,19 +381,6 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       note: driveTime 
         ? `Your estimated drive time${rushHourNote}` 
         : `Typical ${baseDriveTime} min from city center${rushHourNote}—check Google/Apple Maps for your route`,
-    });
-
-    // Head to car
-    const headToCarRange: TimeRange = { min: 3, max: 5 };
-    const headToCarTime = getRiskAdjustedTime(headToCarRange, riskMultiplier);
-    stages.unshift({
-      id: 'leave',
-      label: 'Head to Car',
-      icon: 'home',
-      startTime: subtractMinutes(driveStart, headToCarTime),
-      endTime: driveStart,
-      durationRange: headToCarRange,
-      note: 'Final check: ID, phone, charger, bags',
     });
   }
 
