@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plane, Clock, History } from 'lucide-react';
+import { Plane, Clock, History, Download } from 'lucide-react';
 import { RecentSearch, formatRecentSearchTime } from '@/lib/recentSearches';
 import { getAirportProfile } from '@/lib/airports';
+import { usePWAInstall } from '@/hooks/use-pwa-install';
 
 interface LandingHeroProps {
   onStart: () => void;
@@ -11,6 +12,8 @@ interface LandingHeroProps {
 }
 
 export function LandingHero({ onStart, recentSearches = [], onQuickSearch }: LandingHeroProps) {
+  const { isInstallable, install } = usePWAInstall();
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* App name - top, small but confident */}
@@ -18,12 +21,23 @@ export function LandingHero({ onStart, recentSearches = [], onQuickSearch }: Lan
         <p className="text-muted-foreground text-sm font-medium tracking-widest uppercase">
           JetSweep
         </p>
-        <Link 
-          to="/about" 
-          className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-        >
-          About
-        </Link>
+        <div className="flex items-center gap-4">
+          {isInstallable && (
+            <button
+              onClick={install}
+              className="flex items-center gap-1.5 text-primary hover:text-primary/80 text-sm transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Install
+            </button>
+          )}
+          <Link 
+            to="/about" 
+            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+          >
+            About
+          </Link>
+        </div>
       </header>
 
       {/* Main content - centered vertically */}
