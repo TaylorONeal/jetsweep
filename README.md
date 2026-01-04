@@ -1,73 +1,218 @@
-# Welcome to your Lovable project
+JetSweep
 
-## Project info
+JetSweep is a planning-first airport timing application that helps travelers determine when to leave for the airport based on realistic operational friction rather than optimistic averages or real-time predictions.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+The core problem JetSweep addresses is not route optimization, but risk management. Missing a flight has a high cost, and most existing tools systematically underestimate airport-side variability.
 
-## How can I edit this code?
+JetSweep is designed to be conservative, explainable, and predictable.
 
-There are several ways of editing your application.
+Problem Statement
 
-**Use Lovable**
+Most travel applications answer questions like:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+“What is the fastest route to the airport?”
 
-Changes made via Lovable will be committed automatically to this repo.
+“What time should I arrive?”
 
-**Use your preferred IDE**
+These answers typically rely on:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+optimistic traffic assumptions
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+narrow TSA wait estimates
 
-Follow these steps:
+single-point arrival times
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+They do not model:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+curb congestion
 
-# Step 3: Install the necessary dependencies.
-npm i
+security volatility
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+terminal scale
 
-**Edit a file directly in GitHub**
+operational edge cases that experienced travelers recognize
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+JetSweep instead answers a different question:
 
-**Use GitHub Codespaces**
+When should I leave to arrive at my gate with sufficient margin, given how airports actually behave?
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Core Principles
 
-## What technologies are used for this project?
+Planning over prediction
+JetSweep does not attempt to forecast real-time conditions.
 
-This project is built with:
+Buffers over averages
+All time values are modeled as ranges intended to absorb variability.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Explainability over precision
+If the recommendation is wrong, the reason should be understandable.
 
-## How can I deploy this project?
+Asymmetric risk awareness
+Arriving early is cheap. Missing a flight is expensive.
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+Architecture Overview
 
-## Can I connect a custom domain to my Lovable project?
+JetSweep uses a layered, deterministic model:
 
-Yes, you can!
+1. Airport Tier Model (Backbone)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+All U.S. airports are categorized into four tiers based on scale and operational complexity:
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+MEGA
+
+LARGE
+
+MEDIUM
+
+GENERIC
+
+Each tier defines default ranges for:
+
+curb-to-gate walk time
+
+curb congestion overhead
+
+parking-to-terminal time
+
+rideshare pickup overhead
+
+security variability
+
+checked baggage overhead
+
+typical off-peak drive time from city center
+
+These values represent planning buffers, not historical averages.
+
+2. Exception Airport Overrides
+
+A small, fixed set of airports consistently violate tier assumptions due to layout, access constraints, or operational behavior.
+
+For these airports, JetSweep applies surgical overrides that adjust only the relevant fields and attach a human-readable advisory.
+
+Overrides are intentionally limited in scope and count to preserve:
+
+maintainability
+
+clarity
+
+long-term correctness
+
+3. Deterministic Timeline Calculation
+
+Inputs include:
+
+flight departure time
+
+airport
+
+domestic vs international
+
+checked baggage
+
+security program (none, PreCheck, PreCheck + Clear)
+
+transport mode
+
+travel day type (regular vs peak/holiday)
+
+The system produces a stage-based timeline, including:
+
+leave home window
+
+arrival overhead
+
+bag drop
+
+security
+
+terminal transit
+
+boarding buffer
+
+gate arrival
+
+Each stage is represented as a time window, not a point estimate.
+
+4. Stress Margin Classification
+
+JetSweep classifies the resulting plan using a margin-based heuristic:
+
+CALM: ≥ 25 minutes at gate
+
+TIGHT: 10–24 minutes
+
+RISKY: < 10 minutes
+
+This classification is surfaced prominently and is not softened or hidden.
+
+User Interface
+
+Mobile-first layout
+
+Vertical timeline visualization
+
+Explicit time windows at each stage
+
+Clear separation between recommendation and explanation
+
+Subtle motion used only to improve comprehension
+
+A small advisory element (“Heads up”) is displayed when an airport-specific pain point applies.
+
+Data Model
+
+JetSweep relies on a static, versioned airport model with the following structure:
+
+{
+  code: string;                  // IATA
+  name: string;                  // Full airport name
+  tier: 'MEGA' | 'LARGE' | 'MEDIUM' | 'GENERIC';
+  walk: [number, number];
+  curb: [number, number];
+  parking: [number, number];
+  rideshare: [number, number];
+  securityAdd: [number, number];
+  baggageAdd: [number, number];
+  painPoint?: string;
+  typicalDriveTime: number;
+}
+
+
+No external APIs are required for core functionality.
+
+What JetSweep Explicitly Does Not Do
+
+No real-time traffic integration
+
+No TSA wait-time scraping
+
+No flight tracking
+
+No probabilistic predictions
+
+This is an intentional design constraint.
+
+Intended Audience
+
+Frequent travelers
+
+Travelers managing tight schedules
+
+Users who value reliability over optimism
+
+Teams exploring explainable planning models
+
+Future Work
+
+Potential extensions include:
+
+international airport coverage
+
+optional user calibration over time
+
+refined holiday modeling
+
+scenario comparison views
+
+No commitments are implied.
