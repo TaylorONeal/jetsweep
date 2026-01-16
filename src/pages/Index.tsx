@@ -3,6 +3,7 @@ import { FlightForm } from '@/components/FlightForm';
 import { Timeline } from '@/components/Timeline';
 import { FlightInputs, TimelineResult, computeTimeline } from '@/lib/timeline';
 import { LandingHero } from '@/components/LandingHero';
+import { TakeoffAnimation } from '@/components/TakeoffAnimation';
 import { getRecentSearches, saveRecentSearch, RecentSearch } from '@/lib/recentSearches';
 import { getAirportProfile } from '@/lib/airports';
 
@@ -10,6 +11,8 @@ const Index = () => {
   const [result, setResult] = useState<TimelineResult | null>(null);
   const [flightTime, setFlightTime] = useState<Date | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [showTakeoff, setShowTakeoff] = useState(false);
+  const [pendingInputs, setPendingInputs] = useState<FlightInputs | null>(null);
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
 
   // Load recent searches on mount
@@ -18,22 +21,34 @@ const Index = () => {
   }, []);
 
   const handleSubmit = (inputs: FlightInputs) => {
-    const timeline = computeTimeline(inputs);
+    // Store inputs and show takeoff animation
+    setPendingInputs(inputs);
+    setShowTakeoff(true);
+  };
+
+  const handleTakeoffComplete = () => {
+    if (!pendingInputs) return;
+
+    const timeline = computeTimeline(pendingInputs);
     setResult(timeline);
-    setFlightTime(inputs.departureDateTime);
+    setFlightTime(pendingInputs.departureDateTime);
+    setShowTakeoff(false);
+    setShowForm(false);
 
     // Save to recent searches
-    if (inputs.airport) {
-      const { profile } = getAirportProfile(inputs.airport);
+    if (pendingInputs.airport) {
+      const { profile } = getAirportProfile(pendingInputs.airport);
       saveRecentSearch({
-        airport: inputs.airport,
+        airport: pendingInputs.airport,
         airportName: profile.name,
-        tripType: inputs.tripType,
+        tripType: pendingInputs.tripType,
         leaveTime: timeline.leaveTime.toISOString(),
-        flightTime: inputs.departureDateTime.toISOString(),
+        flightTime: pendingInputs.departureDateTime.toISOString(),
       });
       setRecentSearches(getRecentSearches());
     }
+
+    setPendingInputs(null);
   };
 
   const handleBack = () => {
@@ -69,6 +84,16 @@ const Index = () => {
     };
     handleSubmit(inputs);
   };
+
+  // Show takeoff animation
+  if (showTakeoff && pendingInputs) {
+    return (
+      <TakeoffAnimation
+        onComplete={handleTakeoffComplete}
+        airportCode={pendingInputs.airport}
+      />
+    );
+  }
 
   // Show timeline results
   if (result && flightTime) {

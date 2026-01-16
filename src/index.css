@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -177,15 +177,93 @@
     @apply focus:ring-2 focus:ring-primary/50;
     @apply transition-all duration-200;
   }
+
+  /* Runway visualization */
+  .runway-track {
+    position: relative;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--border)) 10%,
+      hsl(var(--border)) 90%,
+      transparent 100%
+    );
+    height: 4px;
+  }
+
+  .runway-track::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    right: 10%;
+    transform: translateY(-50%);
+    height: 1px;
+    background: repeating-linear-gradient(
+      90deg,
+      hsl(var(--gold) / 0.6),
+      hsl(var(--gold) / 0.6) 20px,
+      transparent 20px,
+      transparent 40px
+    );
+  }
+
+  /* Flight path visualization */
+  .flight-path {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .flight-path::after {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+      180deg,
+      hsl(var(--gold) / 0.1) 0%,
+      hsl(var(--gold) / 0.3) 20%,
+      hsl(var(--cyan) / 0.3) 80%,
+      hsl(var(--cyan) / 0.1) 100%
+    );
+    z-index: 1;
+  }
 }
 
 @layer utilities {
+  /* Base animations */
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out forwards;
   }
 
   .animate-slide-up {
     animation: slideUp 0.4s ease-out forwards;
+  }
+
+  .animate-slide-down {
+    animation: slideDown 0.4s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out forwards;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-glow-pulse {
+    animation: glowPulse 2s ease-in-out infinite;
+  }
+
+  .animate-engine-burn {
+    animation: engineBurn 0.5s ease-in-out infinite;
+  }
+
+  .animate-contrail {
+    animation: contrail 1s linear forwards;
   }
 
   @keyframes fadeIn {
@@ -208,6 +286,69 @@
     }
   }
 
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes glowPulse {
+    0%, 100% {
+      box-shadow: 0 0 20px hsl(var(--gold) / 0.2);
+    }
+    50% {
+      box-shadow: 0 0 40px hsl(var(--gold) / 0.4);
+    }
+  }
+
+  @keyframes engineBurn {
+    0%, 100% {
+      opacity: 0.8;
+      transform: scaleX(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scaleX(1.1);
+    }
+  }
+
+  @keyframes contrail {
+    from {
+      opacity: 0.8;
+      transform: scaleY(1) translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: scaleY(2) translateX(-20px);
+    }
+  }
+
+  /* Stagger animation delays */
   .stagger-1 { animation-delay: 0.05s; }
   .stagger-2 { animation-delay: 0.1s; }
   .stagger-3 { animation-delay: 0.15s; }
@@ -241,5 +382,193 @@
       left: 100%;
       opacity: 0;
     }
+  }
+
+  /* Takeoff sequence animations */
+  @keyframes taxiing {
+    0% {
+      transform: translateX(-100%) rotate(0deg);
+    }
+    100% {
+      transform: translateX(0) rotate(0deg);
+    }
+  }
+
+  @keyframes liftoff {
+    0% {
+      transform: translateX(0) translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateX(30%) translateY(-10%) rotate(-5deg);
+    }
+    100% {
+      transform: translateX(100%) translateY(-100%) rotate(-15deg);
+    }
+  }
+
+  @keyframes climbing {
+    0% {
+      transform: rotate(-15deg);
+    }
+    100% {
+      transform: rotate(-25deg);
+    }
+  }
+
+  /* Particle effects */
+  @keyframes spark {
+    0% {
+      opacity: 1;
+      transform: scale(1) translateX(0);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.5) translateX(-30px);
+    }
+  }
+
+  @keyframes smoke {
+    0% {
+      opacity: 0.6;
+      transform: scale(1) translateX(0);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(3) translateX(-50px);
+    }
+  }
+
+  /* Wing tip vortex animation */
+  @keyframes vortex {
+    0% {
+      opacity: 0.6;
+      transform: scaleY(1) rotate(0deg);
+    }
+    100% {
+      opacity: 0;
+      transform: scaleY(2) rotate(180deg);
+    }
+  }
+
+  /* Runway lights sequence */
+  @keyframes runwayLight {
+    0%, 100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .runway-light {
+    animation: runwayLight 1s ease-in-out infinite;
+  }
+
+  .runway-light:nth-child(1) { animation-delay: 0s; }
+  .runway-light:nth-child(2) { animation-delay: 0.1s; }
+  .runway-light:nth-child(3) { animation-delay: 0.2s; }
+  .runway-light:nth-child(4) { animation-delay: 0.3s; }
+  .runway-light:nth-child(5) { animation-delay: 0.4s; }
+  .runway-light:nth-child(6) { animation-delay: 0.5s; }
+  .runway-light:nth-child(7) { animation-delay: 0.6s; }
+  .runway-light:nth-child(8) { animation-delay: 0.7s; }
+
+  /* Speed lines animation */
+  @keyframes speedLine {
+    0% {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(-40px);
+    }
+  }
+
+  .speed-line {
+    animation: speedLine 0.3s linear forwards;
+  }
+
+  /* Engine glow animation */
+  @keyframes engineGlow {
+    0%, 100% {
+      filter: blur(4px);
+      opacity: 0.6;
+    }
+    50% {
+      filter: blur(6px);
+      opacity: 0.9;
+    }
+  }
+
+  .engine-glow {
+    animation: engineGlow 0.5s ease-in-out infinite;
+  }
+
+  /* Altitude indicator */
+  @keyframes altitudeRise {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-100%);
+    }
+  }
+
+  /* Progress bar shimmer */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--gold) / 0.3) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+
+  /* Button hover effects */
+  .btn-glow:hover {
+    box-shadow:
+      0 0 20px hsl(var(--gold) / 0.3),
+      0 0 40px hsl(var(--gold) / 0.2);
+  }
+
+  /* Card hover effects */
+  .card-hover {
+    transition: all 0.3s ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      var(--shadow-card),
+      0 0 30px hsl(var(--gold) / 0.1);
+  }
+
+  /* Focus ring animation */
+  @keyframes focusRing {
+    0% {
+      box-shadow: 0 0 0 0 hsl(var(--gold) / 0.4);
+    }
+    100% {
+      box-shadow: 0 0 0 4px hsl(var(--gold) / 0);
+    }
+  }
+
+  .focus-ring:focus {
+    animation: focusRing 0.3s ease forwards;
   }
 }
