@@ -3,6 +3,8 @@ import { TimelineCard } from './TimelineCard';
 import { StressMarginMeter } from './StressMarginMeter';
 import { HeadsUpCallout } from './HeadsUpCallout';
 import { TimelineJetIcon } from './TimelineJetIcon';
+import { RouteMapDecoration } from './RouteMapDecoration';
+import { JetTrailDivider } from './JetTrailDivider';
 import {
   Clock,
   AlertTriangle,
@@ -99,10 +101,10 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
         <div className="container py-4">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-4 group"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-300 mb-4 group"
           >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm">Edit Details</span>
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1.5 transition-transform duration-300" />
+            <span className="text-sm relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-primary after:transition-all after:duration-300 group-hover:after:w-full">Edit Details</span>
           </button>
 
           {/* Leave time hero */}
@@ -137,11 +139,11 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
             )}
 
             <div className="flex items-center justify-center gap-3 mt-4">
-              <div className="flex items-center gap-1.5 text-muted-foreground text-sm px-3 py-1.5 rounded-full bg-secondary/50">
+              <div className="flex items-center gap-1.5 text-muted-foreground text-sm px-3 py-1.5 rounded-full bg-secondary/50 hover:bg-secondary transition-colors duration-300">
                 <Plane className="w-4 h-4 text-primary" />
                 <span>Departs {formatTime(flightTime)}</span>
               </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground text-sm px-3 py-1.5 rounded-full bg-secondary/50">
+              <div className="flex items-center gap-1.5 text-muted-foreground text-sm px-3 py-1.5 rounded-full bg-secondary/50 hover:bg-secondary transition-colors duration-300">
                 <Clock className="w-4 h-4 text-accent" />
                 <span>{leaveTimeRange.min}–{leaveTimeRange.max} min total</span>
               </div>
@@ -151,14 +153,23 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
       </header>
 
       <main className="container py-6">
+        {/* Route map decoration between header and content */}
+        <div className="mb-6 animate-fade-in">
+          <RouteMapDecoration variant="section" className="w-full h-10 opacity-50" />
+        </div>
+
         {/* Summary Card */}
-        <div className="card-elevated rounded-lg p-4 mb-6 deco-border animate-slide-up">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="card-elevated rounded-lg p-4 mb-6 deco-border animate-slide-up relative overflow-hidden group">
+          {/* Subtle route background on hover */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+            <RouteMapDecoration variant="card" className="w-full h-full" />
+          </div>
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
             {/* Badges */}
             <div className="flex flex-wrap gap-2">
               {/* Confidence badge */}
               <div className={cn(
-                "inline-flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-300",
+                "inline-flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-300 hover:scale-105",
                 conf.bg, conf.border, conf.glow
               )}>
                 <ConfIcon className={cn("w-4 h-4", conf.color)} />
@@ -167,7 +178,7 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
 
               {/* Stress level badge */}
               <div className={cn(
-                "inline-flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-300",
+                "inline-flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-300 hover:scale-105",
                 stress.bg, stress.border, stress.glow
               )}>
                 <span className={cn("text-sm font-medium", stress.color)}>{stress.label}</span>
@@ -175,7 +186,7 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
               </div>
 
               {/* Airport badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary border border-border">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary border border-border hover:border-primary/30 transition-all duration-300 hover:scale-105">
                 <span className="text-sm font-mono text-primary">{airportProfile.code}</span>
                 {isAirportEstimate && (
                   <>
@@ -234,11 +245,19 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
           </div>
         </div>
 
+        {/* Jet trail divider before summary */}
+        <JetTrailDivider className="my-4 opacity-50" />
+
         {/* Bottom summary card */}
-        <div className="card-elevated rounded-lg p-6 mt-6 deco-border animate-slide-up" style={{ animationDelay: '0.5s', animationFillMode: 'forwards', opacity: 0 }}>
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
-              <Plane className="w-6 h-6 text-primary" />
+        <div className="card-elevated rounded-lg p-6 mt-2 deco-border animate-slide-up relative overflow-hidden group" style={{ animationDelay: '0.5s', animationFillMode: 'forwards', opacity: 0 }}>
+          {/* Route map bg */}
+          <div className="absolute inset-0 opacity-30">
+            <RouteMapDecoration variant="card" className="w-full h-full" />
+          </div>
+
+          <div className="relative z-10 text-center">
+            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/30 group-hover:shadow-[0_0_25px_hsl(var(--gold)_/_0.2)] transition-all duration-500">
+              <Plane className="w-6 h-6 text-primary group-hover:rotate-[-15deg] transition-transform duration-500" />
             </div>
             <p className="text-muted-foreground text-sm mb-2">Recommended Leave Time</p>
             <p
@@ -253,14 +272,26 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
               {formatTime(leaveTimeWindow.earliest)} (earliest) – {formatTime(leaveTimeWindow.latest)} (latest)
             </p>
 
-            {/* Mini timeline visualization */}
+            {/* Mini timeline visualization with animated fill */}
             <div className="mt-6 pt-4 border-t border-border">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>Leave</span>
-                <div className="flex-1 mx-4 h-1 bg-secondary rounded-full overflow-hidden">
+                <div className="flex-1 mx-4 h-1 bg-secondary rounded-full overflow-hidden relative">
                   <div
-                    className="h-full bg-gradient-to-r from-primary to-accent"
-                    style={{ width: '100%' }}
+                    className="h-full bg-gradient-to-r from-primary to-accent rounded-full animate-[shimmer_2s_linear_infinite]"
+                    style={{
+                      width: '100%',
+                      backgroundSize: '200% 100%',
+                      backgroundImage: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary)))',
+                    }}
+                  />
+                  {/* Traveling dot on mini timeline */}
+                  <div
+                    className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_hsl(var(--cyan)_/_0.5)]"
+                    style={{
+                      animation: 'shimmer 3s linear infinite',
+                      left: '50%',
+                    }}
                   />
                 </div>
                 <span>Board</span>
@@ -279,9 +310,9 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
           <Button
             onClick={onBack}
             variant="outline"
-            className="border-border text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all duration-300"
+            className="border-border text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all duration-300 group hover:scale-[1.02] active:scale-[0.98]"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform duration-300" />
             Recalculate
           </Button>
         </div>
