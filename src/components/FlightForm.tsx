@@ -538,7 +538,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
         </p>
       </FormSection>
 
-      <div className="deco-divider" />
+      <JetTrailDivider className="opacity-30" />
 
       {/* Advanced options toggle */}
       <button
