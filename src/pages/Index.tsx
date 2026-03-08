@@ -6,6 +6,7 @@ import { LandingHero } from '@/components/LandingHero';
 import { TakeoffAnimation } from '@/components/TakeoffAnimation';
 import { getRecentSearches, saveRecentSearch, RecentSearch } from '@/lib/recentSearches';
 import { getAirportProfile } from '@/lib/airports';
+import { RouteMapDecoration } from '@/components/RouteMapDecoration';
 
 const Index = () => {
   const [result, setResult] = useState<TimelineResult | null>(null);
