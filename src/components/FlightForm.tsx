@@ -473,7 +473,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
         </div>
       </FormSection>
 
-      <div className="deco-divider" />
+      <JetTrailDivider className="opacity-30" />
 
       {/* Security & Bags */}
       <FormSection icon={Shield} title="Security & Bags" delay={200}>
