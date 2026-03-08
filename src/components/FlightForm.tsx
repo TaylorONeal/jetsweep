@@ -499,7 +499,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
         </div>
       </FormSection>
 
-      <div className="deco-divider" />
+      <JetTrailDivider className="opacity-30" />
 
       {/* Flight Departure Time - Primary */}
       <FormSection
