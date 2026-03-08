@@ -421,7 +421,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
         </p>
       </FormSection>
 
-      <div className="deco-divider" />
+      <JetTrailDivider className="opacity-30" />
 
       {/* Trip Type */}
       <FormSection title="Trip Type" isComplete={true} delay={100}>
