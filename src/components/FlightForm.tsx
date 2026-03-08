@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { FlightInputs } from '@/lib/timeline';
 import { getAllAirports, OTHER_AIRPORT_OPTIONS, getAirportProfile, AirportProfile } from '@/lib/airports';
 import { Button } from '@/components/ui/button';
+import { JetTrailDivider } from './JetTrailDivider';
 import {
   Shield,
   Luggage,
@@ -420,7 +421,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
         </p>
       </FormSection>
 
-      <div className="deco-divider" />
+      <JetTrailDivider className="opacity-30" />
 
       {/* Trip Type */}
       <FormSection title="Trip Type" isComplete={true} delay={100}>
@@ -440,7 +441,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
         </div>
       </FormSection>
 
-      <div className="deco-divider" />
+      <JetTrailDivider className="opacity-30" />
 
       {/* Risk Preference */}
       <FormSection title="How do you travel?" isComplete={true} delay={150}>
@@ -472,7 +473,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
         </div>
       </FormSection>
 
-      <div className="deco-divider" />
+      <JetTrailDivider className="opacity-30" />
 
       {/* Security & Bags */}
       <FormSection icon={Shield} title="Security & Bags" delay={200}>
@@ -498,7 +499,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
         </div>
       </FormSection>
 
-      <div className="deco-divider" />
+      <JetTrailDivider className="opacity-30" />
 
       {/* Flight Departure Time - Primary */}
       <FormSection
@@ -537,7 +538,7 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
         </p>
       </FormSection>
 
-      <div className="deco-divider" />
+      <JetTrailDivider className="opacity-30" />
 
       {/* Advanced options toggle */}
       <button

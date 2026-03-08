@@ -6,6 +6,7 @@ import { LandingHero } from '@/components/LandingHero';
 import { TakeoffAnimation } from '@/components/TakeoffAnimation';
 import { getRecentSearches, saveRecentSearch, RecentSearch } from '@/lib/recentSearches';
 import { getAirportProfile } from '@/lib/airports';
+import { RouteMapDecoration } from '@/components/RouteMapDecoration';
 
 const Index = () => {
   const [result, setResult] = useState<TimelineResult | null>(null);
@@ -103,31 +104,37 @@ const Index = () => {
   // Show input form
   if (showForm) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="pt-safe">
+      <div className="min-h-screen bg-background relative">
+        {/* Subtle route map background */}
+        <div className="absolute top-20 left-0 right-0 opacity-30 pointer-events-none">
+          <RouteMapDecoration variant="section" className="w-full h-12" />
+        </div>
+
+        <header className="pt-safe relative z-10">
           <div className="container py-6">
             <button 
               onClick={handleBackToLanding}
-              className="text-muted-foreground hover:text-foreground transition-colors text-sm"
+              className="text-muted-foreground hover:text-foreground transition-all duration-300 text-sm group flex items-center gap-1"
             >
-              ← Back
+              <span className="group-hover:-translate-x-1 transition-transform duration-300">←</span>
+              <span className="relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-primary after:transition-all after:duration-300 group-hover:after:w-full">Back</span>
             </button>
-            <h1 className="font-display text-2xl font-semibold text-foreground mt-4">
+            <h1 className="font-display text-2xl font-semibold text-foreground mt-4 animate-fade-in">
               Build your timeline
             </h1>
-            <p className="text-muted-foreground text-sm mt-1">
+            <p className="text-muted-foreground text-sm mt-1 animate-fade-in" style={{ animationDelay: '0.1s' }}>
               Enter your flight details below.
             </p>
           </div>
         </header>
 
-        <main className="container pb-12">
+        <main className="container pb-12 relative z-10">
           <div className="max-w-md mx-auto">
-            <div className="card-elevated rounded-2xl p-6 deco-border">
+            <div className="card-elevated rounded-2xl p-6 deco-border animate-slide-up">
               <FlightForm onSubmit={handleSubmit} />
             </div>
 
-            <p className="text-center text-xs text-muted-foreground mt-6 px-4">
+            <p className="text-center text-xs text-muted-foreground mt-6 px-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               Calculations include airport-specific data for the top 25 US airports
               with realistic buffer ranges for each travel stage.
             </p>
