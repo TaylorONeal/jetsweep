@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { FlightInputs } from '@/lib/timeline';
 import { getAllAirports, OTHER_AIRPORT_OPTIONS, getAirportProfile, AirportProfile } from '@/lib/airports';
 import { Button } from '@/components/ui/button';
+import { JetTrailDivider } from './JetTrailDivider';
 import {
   Shield,
   Luggage,
