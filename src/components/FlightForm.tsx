@@ -499,46 +499,6 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
         </div>
       </FormSection>
 
-      <JetTrailDivider className="opacity-30" />
-
-      {/* Flight Departure Time - Primary */}
-      <FormSection
-        icon={Clock}
-        title="Flight Departure"
-        isComplete={!!(departureDate && departureTime)}
-        delay={250}
-      >
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider">
-              Date
-            </label>
-            <input
-              type="date"
-              value={departureDate}
-              onChange={(e) => setDepartureDate(e.target.value)}
-              className="input-field w-full transition-all duration-200 hover:border-border/80"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider flex items-center gap-1">
-              <Calendar className="w-3 h-3" />
-              Time
-            </label>
-            <input
-              type="time"
-              value={departureTime}
-              onChange={(e) => setDepartureTime(e.target.value)}
-              className="input-field w-full transition-all duration-200 hover:border-border/80"
-            />
-          </div>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Pre-filled for 4 hours from now. Adjust as needed.
-        </p>
-      </FormSection>
-
-      <JetTrailDivider className="opacity-30" />
 
       {/* Advanced options toggle */}
       <button
