@@ -312,19 +312,14 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
         : `Typical ${baseDriveTime} min from city center${rushHourNote}—check Google/Apple Maps for your route`,
     });
 
-    // Rideshare pickup (wait for driver)
-    const pickupBase: TimeRange = { min: 8, max: 15 };
-    const pickupAirportAdd: TimeRange = {
-      min: airportProfile.rideshare[0] - 6,
-      max: airportProfile.rideshare[1] - 6,
-    };
+    // Rideshare pickup (wait for driver) - use airport rideshare values directly
     const pickupRange = applyModifiers(
-      addRange(pickupBase, { min: Math.max(0, pickupAirportAdd.min), max: Math.max(0, pickupAirportAdd.max) }),
+      { min: airportProfile.rideshare[0], max: airportProfile.rideshare[1] },
       isHoliday,
       isBadWeather,
       false,
+      { min: 3, max: 5 },
       { min: 5, max: 10 },
-      { min: 10, max: 20 },
       { min: 0, max: 0 }
     );
 
