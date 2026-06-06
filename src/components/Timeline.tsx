@@ -97,7 +97,7 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b border-border">
+      <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b border-border pt-safe">
         <div className="container py-4">
           <button
             onClick={onBack}
@@ -152,7 +152,7 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
         </div>
       </header>
 
-      <main className="container py-6">
+      <main className="container pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
         {/* Route map decoration between header and content */}
         <div className="mb-6 animate-fade-in">
           <RouteMapDecoration variant="section" className="w-full h-10 opacity-50" />
@@ -285,14 +285,8 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
                       backgroundImage: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary)))',
                     }}
                   />
-                  {/* Traveling dot on mini timeline */}
-                  <div
-                    className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_hsl(var(--cyan)_/_0.5)]"
-                    style={{
-                      animation: 'shimmer 3s linear infinite',
-                      left: '50%',
-                    }}
-                  />
+                  {/* Traveling dot that actually glides across the mini timeline */}
+                  <div className="absolute top-1/2 w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_hsl(var(--cyan)_/_0.5)] animate-travel-dot" />
                 </div>
                 <span>Board</span>
               </div>

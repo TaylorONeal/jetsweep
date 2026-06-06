@@ -128,7 +128,7 @@ const Index = () => {
           </div>
         </header>
 
-        <main className="container pb-12 relative z-10">
+        <main className="container pb-[calc(3rem+env(safe-area-inset-bottom))] relative z-10">
           <div className="max-w-md mx-auto">
             <div className="card-elevated rounded-2xl p-6 deco-border animate-slide-up">
               <FlightForm onSubmit={handleSubmit} />
