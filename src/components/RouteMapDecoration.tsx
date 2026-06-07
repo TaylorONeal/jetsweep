@@ -1,24 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 
 interface RouteMapDecorationProps {
   className?: string;
   variant?: 'hero' | 'section' | 'card';
 }
 
+// Seamless dash march via CSS: animate stroke-dashoffset by one dash+gap period.
+// Done in CSS (not a per-frame JS RAF loop) so it costs no React re-renders and
+// is automatically tamed by the global prefers-reduced-motion guard.
+function dashFlow(period: number, durationSec: number): CSSProperties {
+  return {
+    animation: `routeDash ${durationSec}s linear infinite`,
+    ['--dash-end' as string]: `-${period}px`,
+  } as CSSProperties;
+}
+
 /** Thin-line SVG route map with animated dashed flight path and traveling plane dot */
 export function RouteMapDecoration({ className = '', variant = 'hero' }: RouteMapDecorationProps) {
-  const [dashOffset, setDashOffset] = useState(0);
-  const animRef = useRef<number>();
-
-  useEffect(() => {
-    const animate = () => {
-      setDashOffset(prev => (prev - 0.5) % 1000);
-      animRef.current = requestAnimationFrame(animate);
-    };
-    animRef.current = requestAnimationFrame(animate);
-    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
-  }, []);
-
   if (variant === 'card') {
     return (
       <svg className={`pointer-events-none ${className}`} viewBox="0 0 200 40" fill="none" preserveAspectRatio="none">
@@ -27,7 +25,7 @@ export function RouteMapDecoration({ className = '', variant = 'hero' }: RouteMa
           stroke="hsl(var(--gold) / 0.15)"
           strokeWidth="1"
           strokeDasharray="4 6"
-          strokeDashoffset={dashOffset * 0.3}
+          style={dashFlow(10, 2.2)}
         />
         <circle r="2" fill="hsl(var(--gold) / 0.5)">
           <animateMotion dur="4s" repeatCount="indefinite" path="M0 30 Q50 5 100 20 T200 10" />
@@ -45,7 +43,7 @@ export function RouteMapDecoration({ className = '', variant = 'hero' }: RouteMa
           stroke="hsl(var(--gold) / 0.12)"
           strokeWidth="0.75"
           strokeDasharray="6 8"
-          strokeDashoffset={dashOffset * 0.4}
+          style={dashFlow(14, 2)}
         />
         {/* Waypoint dots */}
         <circle cx="0" cy="50" r="2" fill="hsl(var(--gold) / 0.3)" />
@@ -72,7 +70,7 @@ export function RouteMapDecoration({ className = '', variant = 'hero' }: RouteMa
         stroke="hsl(var(--gold) / 0.1)"
         strokeWidth="1"
         strokeDasharray="8 12"
-        strokeDashoffset={dashOffset * 0.5}
+        style={dashFlow(20, 2.6)}
       />
       {/* Second ghost route */}
       <path
@@ -80,7 +78,7 @@ export function RouteMapDecoration({ className = '', variant = 'hero' }: RouteMa
         stroke="hsl(var(--cyan) / 0.06)"
         strokeWidth="0.5"
         strokeDasharray="4 10"
-        strokeDashoffset={dashOffset * 0.3}
+        style={dashFlow(14, 3.2)}
       />
       {/* Origin marker */}
       <circle cx="20" cy="100" r="3" fill="none" stroke="hsl(var(--gold) / 0.3)" strokeWidth="1" />

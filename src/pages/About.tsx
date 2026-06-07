@@ -25,7 +25,7 @@ const About = () => {
         </div>
       </header>
 
-      <main className="container pb-12">
+      <main className="container pb-[calc(3rem+env(safe-area-inset-bottom))]">
         <div className="max-w-2xl mx-auto space-y-12">
           {/* Mission */}
           <section className="card-elevated rounded-2xl p-6 deco-border">
@@ -60,7 +60,7 @@ const About = () => {
                 <div>
                   <h3 className="font-medium text-foreground">Select your airport</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    We have specific data for the top 25 US airports—walk distances, security wait multipliers, 
+                    We have specific data for the top 100 US airports—walk distances, security wait multipliers,
                     parking patterns, and more.
                   </p>
                 </div>
@@ -146,13 +146,13 @@ const About = () => {
                 and your risk preference determines where in that range we target.
               </p>
               <p>
-                <strong className="text-foreground">Early Bird:</strong> Uses maximum estimates—you'll likely have time to spare.
+                <strong className="text-foreground">Early Bird:</strong> Targets the high end of every buffer—you'll likely have time to spare.
               </p>
               <p>
-                <strong className="text-foreground">Balanced:</strong> Targets 75th percentile—comfortable with small buffer.
+                <strong className="text-foreground">Balanced:</strong> Aims for a comfortable spot toward the upper-middle of each range.
               </p>
               <p>
-                <strong className="text-foreground">Seat of Pants:</strong> Uses minimum estimates—works if everything goes smoothly.
+                <strong className="text-foreground">Seat of Pants:</strong> Leans toward the low end—works if everything goes smoothly.
               </p>
               <p className="pt-2 border-t border-border mt-4">
                 Drive times default to typical city-center estimates. For precision, check Google Maps or Apple Maps 

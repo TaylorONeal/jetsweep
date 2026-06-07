@@ -23,25 +23,53 @@ export function TimelineJetIcon({ stageCount }: TimelineJetIconProps) {
   const lastScrollProgress = useRef(0);
   const particleIdRef = useRef(0);
   const animationFrameRef = useRef<number>();
+  const smoothRef = useRef(0);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
-  // Smooth physics-based interpolation
+  // Track the user's motion preference.
   useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setPrefersReducedMotion(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  // Smooth physics-based interpolation. Stops scheduling frames once it has
+  // converged on the scroll position, so an idle timeline doesn't re-render at
+  // 60fps forever; any scroll re-runs this effect and restarts the loop.
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      smoothRef.current = scrollProgress;
+      setSmoothProgress(scrollProgress);
+      setVelocity(0);
+      return;
+    }
+
     const animate = () => {
-      setSmoothProgress(prev => {
-        const diff = scrollProgress - prev;
-        const newVelocity = diff * 0.15;
-        setVelocity(newVelocity);
-        return prev + newVelocity;
-      });
+      const diff = scrollProgress - smoothRef.current;
+      const newVelocity = diff * 0.15;
+      smoothRef.current += newVelocity;
+      setSmoothProgress(smoothRef.current);
+      setVelocity(newVelocity);
+
+      if (Math.abs(diff) < 0.0005) {
+        smoothRef.current = scrollProgress;
+        setSmoothProgress(scrollProgress);
+        setVelocity(0);
+        animationFrameRef.current = undefined;
+        return;
+      }
       animationFrameRef.current = requestAnimationFrame(animate);
     };
+
     animationFrameRef.current = requestAnimationFrame(animate);
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [scrollProgress]);
+  }, [scrollProgress, prefersReducedMotion]);
 
   // Generate contrail particles
   const generateParticle = useCallback(() => {
@@ -60,22 +88,25 @@ export function TimelineJetIcon({ stageCount }: TimelineJetIconProps) {
 
   // Particle generation interval
   useEffect(() => {
+    if (prefersReducedMotion) return;
     const interval = setInterval(generateParticle, 80);
     return () => clearInterval(interval);
-  }, [generateParticle]);
+  }, [generateParticle, prefersReducedMotion]);
 
   // Decay particles
   useEffect(() => {
     const interval = setInterval(() => {
       setParticles(prev =>
-        prev
-          .map(p => ({
-            ...p,
-            opacity: p.opacity - 0.08,
-            scale: p.scale * 1.15,
-            y: p.y - 8,
-          }))
-          .filter(p => p.opacity > 0)
+        prev.length === 0
+          ? prev
+          : prev
+              .map(p => ({
+                ...p,
+                opacity: p.opacity - 0.08,
+                scale: p.scale * 1.15,
+                y: p.y - 8,
+              }))
+              .filter(p => p.opacity > 0)
       );
     }, 50);
     return () => clearInterval(interval);

@@ -629,6 +629,14 @@
   .animate-travel-dot {
     animation: travelDot 3s ease-in-out infinite;
   }
+
+  /* Marching dashed flight path (replaces a per-frame JS requestAnimationFrame
+     loop). Each path sets --dash-end to its dash+gap period for a seamless loop. */
+  @keyframes routeDash {
+    to {
+      stroke-dashoffset: var(--dash-end, -20px);
+    }
+  }
 }
 
 /* Respect users who prefer reduced motion: keep meaning, drop the motion.

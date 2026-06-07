@@ -135,7 +135,7 @@ const Index = () => {
             </div>
 
             <p className="text-center text-xs text-muted-foreground mt-6 px-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              Calculations include airport-specific data for the top 25 US airports
+              Calculations include airport-specific data for the top 100 US airports
               with realistic buffer ranges for each travel stage.
             </p>
           </div>
