@@ -176,7 +176,7 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     startTime: subtractMinutes(gateArrival, walkTime),
     endTime: gateArrival,
     durationRange: walkRange,
-    note: `${formatTimeRange(walkRange)} walk through terminal${airportProfile.painPoint ? `. ${airportProfile.painPoint}` : ''}`,
+    note: `${formatTimeRange(walkRange)} walk through terminal${airportProfile.painPoint ? `. ${airportProfile.painPoint}` : ''}. Then ~${gateBufferMin} min cushion at the gate before boarding.`,
   });
 
   // Check if there's buffer for lounge/food
@@ -427,11 +427,13 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     ? Math.round((boardingStage.startTime.getTime() - gateStage.endTime.getTime()) / 60000)
     : 0;
 
-  // Determine stress level
+  // Determine stress level from the gate cushion (minutes at the gate before
+  // boarding). A typical comfortable cushion is ~20-25 min, so only flag plans
+  // that genuinely leave little slack.
   let stressLevel: StressLevel = 'CALM';
-  if (stressMargin < 10) {
+  if (stressMargin < 12) {
     stressLevel = 'RISKY';
-  } else if (stressMargin < 25) {
+  } else if (stressMargin < 20) {
     stressLevel = 'TIGHT';
   }
 
