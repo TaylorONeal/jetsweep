@@ -1,5 +1,6 @@
 import { Plane } from 'lucide-react';
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { usePrefersReducedMotion } from '@/hooks/use-reduced-motion';
 
 interface TimelineJetIconProps {
   stageCount: number;
@@ -24,16 +25,7 @@ export function TimelineJetIcon({ stageCount }: TimelineJetIconProps) {
   const particleIdRef = useRef(0);
   const animationFrameRef = useRef<number>();
   const smoothRef = useRef(0);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  // Track the user's motion preference.
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setPrefersReducedMotion(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   // Smooth physics-based interpolation. Stops scheduling frames once it has
   // converged on the scroll position, so an idle timeline doesn't re-render at
