@@ -72,8 +72,7 @@ function subtractMinutes(date: Date, minutes: number): Date {
   return new Date(date.getTime() - minutes * 60 * 1000);
 }
 
-// Apply risk multiplier to get the buffer time from a range
-// early = max, balanced = 75% between min and max, risky = min
+// Pick a point within a buffer range using the risk multiplier (0 = min, 1 = max).
 function getRiskAdjustedTime(range: TimeRange, multiplier: number): number {
   return Math.round(range.min + (range.max - range.min) * multiplier);
 }
@@ -109,9 +108,9 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
   // Holiday is true if auto-detected OR manually set
   const isHoliday = manualHoliday || travelConditions.holidayImpact !== null;
 
-  // Risk multiplier affects buffer times
-  // early = use max times (1.0), balanced = use ~75% (0.75), risky = use min times (0.5)
-  const riskMultiplier = riskPreference === 'early' ? 1.0 : riskPreference === 'balanced' ? 0.75 : 0.5;
+  // Risk preference selects where in each stage's buffer range we land.
+  // early = full buffers (max), balanced = a comfortable middle, risky = lean (near min).
+  const riskMultiplier = riskPreference === 'early' ? 1.0 : riskPreference === 'balanced' ? 0.7 : 0.35;
 
   // Get airport profile
   const { profile: airportProfile, isEstimate: isAirportEstimate } = airport
@@ -133,6 +132,15 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
 
   // Boarding
   const boardingStartOffset = isInternational ? 50 : 40;
+
+  // Accumulate the true door-to-door budget (leave time -> departure) as we build
+  // the backward chain. This MUST mirror the chained stage math, including the gate
+  // cushion and the full boarding offset, neither of which is its own visible stage.
+  // (Summing only the visible stages' durationRanges undercounts by ~40-90 min, which
+  // would push the "Leave by" headline outside its own displayed window.)
+  let totalMin = boardingStartOffset;
+  let totalMax = boardingStartOffset;
+
   const boardingStart = subtractMinutes(departureDateTime, boardingStartOffset);
   const boardingEnd = subtractMinutes(departureDateTime, boardingStartOffset - 20);
 
@@ -150,11 +158,15 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
 
   // Gate arrival - apply risk multiplier
   const gateBufferBase: TimeRange = isInternational ? { min: 20, max: 30 } : { min: 15, max: 25 };
+  totalMin += gateBufferBase.min;
+  totalMax += gateBufferBase.max;
   const gateBufferMin = getRiskAdjustedTime(gateBufferBase, riskMultiplier);
   const gateArrival = subtractMinutes(boardingStart, gateBufferMin);
   const walkRange: TimeRange = isInternational 
     ? { min: Math.max(15, airportProfile.walk[0]), max: Math.max(25, airportProfile.walk[1]) }
     : { min: airportProfile.walk[0], max: airportProfile.walk[1] };
+  totalMin += walkRange.min;
+  totalMax += walkRange.max;
   const walkTime = getRiskAdjustedTime(walkRange, riskMultiplier);
 
   stages.unshift({
@@ -164,7 +176,7 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     startTime: subtractMinutes(gateArrival, walkTime),
     endTime: gateArrival,
     durationRange: walkRange,
-    note: `${formatTimeRange(walkRange)} walk through terminal${airportProfile.painPoint ? `. ${airportProfile.painPoint}` : ''}`,
+    note: `${formatTimeRange(walkRange)} walk through terminal${airportProfile.painPoint ? `. ${airportProfile.painPoint}` : ''}. Then ~${gateBufferMin} min cushion at the gate before boarding.`,
   });
 
   // Check if there's buffer for lounge/food
@@ -205,6 +217,9 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     { min: 0, max: 0 },
     { min: 5, max: 15 }
   );
+
+  totalMin += securityRange.min;
+  totalMax += securityRange.max;
 
   const securityEnd = securityExitTarget;
   const securityTime = getRiskAdjustedTime(securityRange, riskMultiplier);
@@ -248,6 +263,9 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       { min: 5, max: 10 }
     );
 
+    totalMin += baggageRange.min;
+    totalMax += baggageRange.max;
+
     const baggageTime = getRiskAdjustedTime(baggageRange, riskMultiplier);
     const baggageStart = subtractMinutes(securityStart, baggageTime);
     baggageEnd = securityStart;
@@ -274,6 +292,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     min: airportProfile.curb[0],
     max: airportProfile.curb[1],
   };
+  totalMin += curbRange.min;
+  totalMax += curbRange.max;
 
   const curbTime = getRiskAdjustedTime(curbRange, riskMultiplier);
   const arrivalStart = subtractMinutes(arrivalTarget, curbTime);
@@ -293,6 +313,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     // Drive time to airport (rideshare drives you)
     const baseDriveTime = driveTime ?? airportProfile.typicalDriveTime;
     const actualDriveTime = Math.round(baseDriveTime * travelConditions.trafficMultiplier);
+    totalMin += actualDriveTime;
+    totalMax += actualDriveTime;
     const driveEnd = arrivalStart;
     const driveStart = subtractMinutes(driveEnd, actualDriveTime);
 
@@ -323,6 +345,9 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
       { min: 0, max: 0 }
     );
 
+    totalMin += pickupRange.min;
+    totalMax += pickupRange.max;
+
     const pickupEnd = driveStart;
     const pickupTime = getRiskAdjustedTime(pickupRange, riskMultiplier);
     const pickupStart = subtractMinutes(pickupEnd, pickupTime);
@@ -341,6 +366,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
 
     // Call rideshare
     const callRange: TimeRange = { min: 2, max: 5 };
+    totalMin += callRange.min;
+    totalMax += callRange.max;
     const callEnd = pickupStart;
     const callTime = getRiskAdjustedTime(callRange, riskMultiplier);
     const callStart = subtractMinutes(callEnd, callTime);
@@ -359,6 +386,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     // Drive time to airport (apply rush hour multiplier)
     const baseDriveTime = driveTime ?? airportProfile.typicalDriveTime;
     const actualDriveTime = Math.round(baseDriveTime * travelConditions.trafficMultiplier);
+    totalMin += actualDriveTime;
+    totalMax += actualDriveTime;
     const driveEnd = arrivalStart;
     const driveStart = subtractMinutes(driveEnd, actualDriveTime);
 
@@ -384,9 +413,8 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
   const now = new Date();
   const isLeaveNow = leaveTime <= now;
 
-  // Calculate total range
-  const totalMin = stages.reduce((sum, s) => sum + s.durationRange.min, 0);
-  const totalMax = stages.reduce((sum, s) => sum + s.durationRange.max, 0);
+  // totalMin / totalMax were accumulated above to mirror the backward chain, so the
+  // recommended (risk-adjusted) leave time always falls within [earliest, latest].
 
   // Calculate leave time window (earliest to latest)
   const leaveTimeEarliest = subtractMinutes(departureDateTime, totalMax);
@@ -399,11 +427,13 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
     ? Math.round((boardingStage.startTime.getTime() - gateStage.endTime.getTime()) / 60000)
     : 0;
 
-  // Determine stress level
+  // Determine stress level from the gate cushion (minutes at the gate before
+  // boarding). A typical comfortable cushion is ~20-25 min, so only flag plans
+  // that genuinely leave little slack.
   let stressLevel: StressLevel = 'CALM';
-  if (stressMargin < 10) {
+  if (stressMargin < 12) {
     stressLevel = 'RISKY';
-  } else if (stressMargin < 25) {
+  } else if (stressMargin < 20) {
     stressLevel = 'TIGHT';
   }
 

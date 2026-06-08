@@ -128,14 +128,14 @@ const Index = () => {
           </div>
         </header>
 
-        <main className="container pb-12 relative z-10">
+        <main className="container pb-[calc(3rem+env(safe-area-inset-bottom))] relative z-10">
           <div className="max-w-md mx-auto">
             <div className="card-elevated rounded-2xl p-6 deco-border animate-slide-up">
               <FlightForm onSubmit={handleSubmit} />
             </div>
 
             <p className="text-center text-xs text-muted-foreground mt-6 px-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              Calculations include airport-specific data for the top 25 US airports
+              Calculations include airport-specific data for the top 100 US airports
               with realistic buffer ranges for each travel stage.
             </p>
           </div>

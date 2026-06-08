@@ -100,14 +100,14 @@ export function LandingHero({ onStart, recentSearches = [], onQuickSearch }: Lan
       />
 
       {/* Route map background decoration */}
-      <div className={`fixed top-[15%] left-0 right-0 opacity-0 transition-opacity duration-[2000ms] ${mounted ? 'opacity-100' : ''}`}>
+      <div className={`fixed top-[15%] left-0 right-0 opacity-0 transition-opacity [transition-duration:2000ms] ${mounted ? 'opacity-100' : ''}`}>
         <RouteMapDecoration variant="hero" className="w-full h-auto" />
       </div>
 
       <ParticleField />
 
       {/* App name - top, small but confident */}
-      <header className="pt-12 px-6 flex items-center justify-between relative z-10">
+      <header className="pt-[calc(3rem+env(safe-area-inset-top))] px-6 flex items-center justify-between relative z-10">
         <div className="flex items-center gap-2 group cursor-default">
           <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-all duration-500 group-hover:shadow-[0_0_20px_hsl(var(--gold)_/_0.2)]">
             <Plane className="w-4 h-4 text-primary group-hover:rotate-[-15deg] transition-transform duration-500" />
@@ -224,7 +224,7 @@ export function LandingHero({ onStart, recentSearches = [], onQuickSearch }: Lan
       </main>
 
       {/* Subtle credibility line - very small, near bottom */}
-      <footer className="pb-8 px-6 relative z-10">
+      <footer className="pb-[calc(2rem+env(safe-area-inset-bottom))] px-6 relative z-10">
         <JetTrailDivider className="mb-4 opacity-40" />
         <p className="text-center text-xs text-muted-foreground/70 animate-fade-in" style={{ animationDelay: '0.5s' }}>
           Airport-specific logic. Real buffers. No guessing.

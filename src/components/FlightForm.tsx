@@ -110,6 +110,7 @@ function ToggleButton({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={selected}
       className={cn(
         "py-3 px-4 rounded-lg border text-sm font-medium transition-all duration-200",
         "hover:scale-[1.02] active:scale-[0.98]",
@@ -392,12 +393,15 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
         <div className="flex items-center gap-3">
           <div className="flex-1 relative">
             <input
+              id="driveTime"
               type="number"
+              inputMode="numeric"
               min="1"
               max="180"
               value={driveTime}
               onChange={(e) => setDriveTime(e.target.value)}
               placeholder={defaultDriveTime.toString()}
+              aria-label="Drive time to airport in minutes"
               className="input-field w-full pr-12 transition-all duration-200 hover:border-border/80 focus:scale-[1.01]"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
@@ -432,10 +436,11 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
       >
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider">
+            <label htmlFor="departureDate" className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider">
               Date
             </label>
             <input
+              id="departureDate"
               type="date"
               value={departureDate}
               onChange={(e) => setDepartureDate(e.target.value)}
@@ -443,11 +448,12 @@ export function FlightForm({ onSubmit }: FlightFormProps) {
             />
           </div>
           <div>
-            <label className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider flex items-center gap-1">
+            <label htmlFor="departureTime" className="block text-xs text-muted-foreground mb-1.5 uppercase tracking-wider flex items-center gap-1">
               <Calendar className="w-3 h-3" />
               Time
             </label>
             <input
+              id="departureTime"
               type="time"
               value={departureTime}
               onChange={(e) => setDepartureTime(e.target.value)}
