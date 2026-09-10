@@ -82,7 +82,32 @@ function formatTimeRange(range: TimeRange): string {
   return `${range.min}–${range.max} min`;
 }
 
-export function computeTimeline(inputs: FlightInputs): TimelineResult {
+export function computeTimeline(inputs: FlightInputs, now = new Date()): TimelineResult {
+  const holiday = analyzeTravelConditions(inputs.departureDateTime).holidayImpact;
+  let conditions: TravelConditions = {
+    isRushHour: false, rushHourSeverity: 'none', trafficMultiplier: 1,
+    holidayImpact: holiday, securityMultiplier: holiday?.securityMultiplier ?? 1,
+    notes: holiday ? [holiday.description] : [],
+  };
+  // Start without traffic, then expand the drive interval if it crosses rush hour.
+  // There are only three multipliers (1, 1.15, 1.35), so three passes suffice.
+  for (let pass = 0; pass < 3; pass++) {
+    const result = computeTimelineWithConditions(inputs, now, conditions);
+    const drive = result.stages.find(stage => stage.id === 'drive')!;
+    const roadConditions = analyzeTravelConditions(inputs.departureDateTime, {
+      start: drive.startTime, end: drive.endTime,
+    });
+    if (roadConditions.trafficMultiplier <= conditions.trafficMultiplier) return result;
+    conditions = roadConditions;
+  }
+  throw new Error('Traffic planning did not converge');
+}
+
+function computeTimelineWithConditions(
+  inputs: FlightInputs, now: Date, travelConditions: TravelConditions,
+): TimelineResult {
+  if (!Number.isFinite(inputs.departureDateTime.getTime())) throw new Error("Invalid departure date");
+  if (inputs.driveTime !== undefined && (!Number.isInteger(inputs.driveTime) || inputs.driveTime < 1 || inputs.driveTime > 360)) throw new Error("Invalid drive time");
   const {
     departureDateTime,
     tripType,
@@ -103,7 +128,7 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
   const isRideshare = transportType === 'rideshare';
 
   // Analyze travel conditions (rush hour, holidays)
-  const travelConditions = analyzeTravelConditions(departureDateTime);
+
   
   // Holiday is true if auto-detected OR manually set
   const isHoliday = manualHoliday || travelConditions.holidayImpact !== null;
@@ -410,7 +435,6 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
 
   // Calculate leave time
   const leaveTime = stages[0].startTime;
-  const now = new Date();
   const isLeaveNow = leaveTime <= now;
 
   // totalMin / totalMax were accumulated above to mirror the backward chain, so the
@@ -439,7 +463,7 @@ export function computeTimeline(inputs: FlightInputs): TimelineResult {
 
   return {
     stages,
-    leaveTime: isLeaveNow ? now : leaveTime,
+    leaveTime,
     leaveTimeRange: { min: totalMin, max: totalMax },
     leaveTimeWindow: { earliest: leaveTimeEarliest, latest: leaveTimeLatest },
     confidence,
@@ -461,5 +485,9 @@ export function formatTime(date: Date): string {
 }
 
 export function formatTimeRangeDisplay(start: Date, end: Date): string {
+  if (start.toDateString() !== end.toDateString()) {
+    const label = (date: Date) => `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}, ${formatTime(date)}`;
+    return `${label(start)} – ${label(end)}`;
+  }
   return `${formatTime(start)} – ${formatTime(end)}`;
 }

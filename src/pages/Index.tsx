@@ -1,157 +1,97 @@
-import { useState, useEffect } from 'react';
-import { FlightForm } from '@/components/FlightForm';
-import { Timeline } from '@/components/Timeline';
-import { FlightInputs, TimelineResult, computeTimeline } from '@/lib/timeline';
-import { LandingHero } from '@/components/LandingHero';
-import { TakeoffAnimation } from '@/components/TakeoffAnimation';
-import { getRecentSearches, saveRecentSearch, RecentSearch } from '@/lib/recentSearches';
-import { getAirportProfile } from '@/lib/airports';
-import { RouteMapDecoration } from '@/components/RouteMapDecoration';
+import { useEffect, useState } from "react";
+import { FlightForm } from "@/components/FlightForm";
+import { Timeline } from "@/components/Timeline";
+import { FlightInputs, computeTimeline } from "@/lib/timeline";
+import { LandingHero } from "@/components/LandingHero";
+import {
+  getRecentSearches,
+  saveRecentSearch,
+  RecentSearch,
+} from "@/lib/recentSearches";
 
 const Index = () => {
-  const [result, setResult] = useState<TimelineResult | null>(null);
-  const [flightTime, setFlightTime] = useState<Date | null>(null);
-  const [showForm, setShowForm] = useState(false);
-  const [showTakeoff, setShowTakeoff] = useState(false);
-  const [pendingInputs, setPendingInputs] = useState<FlightInputs | null>(null);
-  const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
-
-  // Load recent searches on mount
+  const [screen, setScreen] = useState<"home" | "form" | "result">("home");
+  const [inputs, setInputs] = useState<Partial<FlightInputs>>();
+  const [result, setResult] = useState<ReturnType<
+    typeof computeTimeline
+  > | null>(null);
+  const [recentSearches, setRecentSearches] = useState(getRecentSearches);
   useEffect(() => {
-    setRecentSearches(getRecentSearches());
+    window.scrollTo(0, 0);
+  }, [screen]);
+  // Use browser history for Android's system back gesture as well as browser Back.
+  useEffect(() => {
+    const back = () => setScreen("home");
+    window.addEventListener("popstate", back);
+    return () => window.removeEventListener("popstate", back);
   }, []);
-
-  const handleSubmit = (inputs: FlightInputs) => {
-    // Store inputs and show takeoff animation
-    setPendingInputs(inputs);
-    setShowTakeoff(true);
+  const openForm = (initial?: Partial<FlightInputs>) => {
+    setInputs(initial);
+    if (screen === "home")
+      window.history.pushState({}, "", window.location.href);
+    setScreen("form");
   };
-
-  const handleTakeoffComplete = () => {
-    if (!pendingInputs) return;
-
-    const timeline = computeTimeline(pendingInputs);
+  const submit = (next: FlightInputs) => {
+    const timeline = computeTimeline(next);
+    setInputs(next);
     setResult(timeline);
-    setFlightTime(pendingInputs.departureDateTime);
-    setShowTakeoff(false);
-    setShowForm(false);
-
-    // Save to recent searches
-    if (pendingInputs.airport) {
-      const { profile } = getAirportProfile(pendingInputs.airport);
-      saveRecentSearch({
-        airport: pendingInputs.airport,
-        airportName: profile.name,
-        tripType: pendingInputs.tripType,
-        leaveTime: timeline.leaveTime.toISOString(),
-        flightTime: pendingInputs.departureDateTime.toISOString(),
-      });
-      setRecentSearches(getRecentSearches());
-    }
-
-    setPendingInputs(null);
+    const { departureDateTime, ...savedInputs } = next;
+    saveRecentSearch({
+      airport: next.airport!,
+      airportName: timeline.airportProfile.name,
+      tripType: next.tripType,
+      leaveTime: timeline.leaveTime.toISOString(),
+      flightTime: departureDateTime.toISOString(),
+      inputs: savedInputs,
+    });
+    setRecentSearches(getRecentSearches());
+    setScreen("result");
   };
-
-  const handleBack = () => {
-    setResult(null);
-    setFlightTime(null);
-  };
-
-  const handleBackToLanding = () => {
-    setShowForm(false);
-    setResult(null);
-    setFlightTime(null);
-  };
-
-  const handleStartFlow = () => {
-    setShowForm(true);
-  };
-
-  const handleQuickSearch = (search: RecentSearch) => {
-    // Create a quick calculation with defaults from the recent search
-    const departureDateTime = new Date(Date.now() + 2 * 60 * 60 * 1000);
-    const inputs: FlightInputs = {
-      departureDateTime,
-      tripType: search.tripType,
-      hasPreCheck: false,
-      hasClear: false,
-      hasCheckedBag: false,
+  const reuse = (search: RecentSearch) =>
+    openForm({
+      ...search.inputs,
       airport: search.airport,
-      groupType: 'solo',
-      transportType: 'rideshare',
-      isHoliday: false,
-      isBadWeather: false,
-      riskPreference: 'balanced',
-    };
-    handleSubmit(inputs);
-  };
-
-  // Show takeoff animation
-  if (showTakeoff && pendingInputs) {
+      tripType: search.tripType,
+      departureDateTime: new Date(search.flightTime),
+    });
+  if (screen === "result" && result && inputs?.departureDateTime)
     return (
-      <TakeoffAnimation
-        onComplete={handleTakeoffComplete}
-        airportCode={pendingInputs.airport}
+      <Timeline
+        result={result}
+        flightTime={inputs.departureDateTime}
+        onBack={() => setScreen("form")}
       />
     );
-  }
-
-  // Show timeline results
-  if (result && flightTime) {
-    return <Timeline result={result} flightTime={flightTime} onBack={handleBack} />;
-  }
-
-  // Show input form
-  if (showForm) {
+  if (screen === "form")
     return (
-      <div className="min-h-screen bg-background relative">
-        {/* Subtle route map background */}
-        <div className="absolute top-20 left-0 right-0 opacity-30 pointer-events-none">
-          <RouteMapDecoration variant="section" className="w-full h-12" />
-        </div>
-
-        <header className="pt-safe relative z-10">
-          <div className="container py-6">
-            <button 
-              onClick={handleBackToLanding}
-              className="text-muted-foreground hover:text-foreground transition-all duration-300 text-sm group flex items-center gap-1"
-            >
-              <span className="group-hover:-translate-x-1 transition-transform duration-300">←</span>
-              <span className="relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-primary after:transition-all after:duration-300 group-hover:after:w-full">Back</span>
-            </button>
-            <h1 className="font-display text-2xl font-semibold text-foreground mt-4 animate-fade-in">
-              Build your timeline
-            </h1>
-            <p className="text-muted-foreground text-sm mt-1 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Enter your flight details below.
-            </p>
-          </div>
+      <div className="min-h-screen bg-background pt-safe pb-safe">
+        <header className="container max-w-lg py-4">
+          <button
+            className="text-sm text-muted-foreground min-h-11"
+            onClick={() => window.history.back()}
+          >
+            ← Home
+          </button>
+          <p className="text-primary text-xs tracking-[0.25em] uppercase mt-2">
+            JetSweep / Departure planner
+          </p>
         </header>
-
-        <main className="container pb-[calc(3rem+env(safe-area-inset-bottom))] relative z-10">
-          <div className="max-w-md mx-auto">
-            <div className="card-elevated rounded-2xl p-6 deco-border animate-slide-up">
-              <FlightForm onSubmit={handleSubmit} />
-            </div>
-
-            <p className="text-center text-xs text-muted-foreground mt-6 px-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              Calculations include airport-specific data for the top 100 US airports
-              with realistic buffer ranges for each travel stage.
-            </p>
+        <main className="container max-w-lg pb-8">
+          <div className="card-elevated rounded-3xl p-5 sm:p-6">
+            <FlightForm onSubmit={submit} initialInputs={inputs} />
           </div>
+          <p className="text-center text-xs text-muted-foreground mt-5">
+            Your recent plans stay on this device.
+          </p>
         </main>
       </div>
     );
-  }
-
-  // Show landing hero
   return (
-    <LandingHero 
-      onStart={handleStartFlow} 
+    <LandingHero
+      onStart={() => openForm()}
       recentSearches={recentSearches}
-      onQuickSearch={handleQuickSearch}
+      onQuickSearch={reuse}
     />
   );
 };
-
 export default Index;

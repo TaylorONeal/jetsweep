@@ -7,18 +7,10 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: "https",
   },
+  backgroundColor: "#0b1014",
+  plugins: { SystemBars: { style: "DARK" } },
   ios: {
-    contentInset: "always",
-  },
-  plugins: {
-    SplashScreen: {
-      launchShowDuration: 0,
-      backgroundColor: "#0a0a0a",
-    },
-    StatusBar: {
-      style: "dark",
-      backgroundColor: "#0a0a0a",
-    },
+    contentInset: "never",
   },
 };
 

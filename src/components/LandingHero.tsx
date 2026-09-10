@@ -87,7 +87,7 @@ export function LandingHero({ onStart, recentSearches = [], onQuickSearch }: Lan
   }, []);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pt-safe">
       {/* Background gradient */}
       <div
         className="fixed inset-0 pointer-events-none"
@@ -100,7 +100,7 @@ export function LandingHero({ onStart, recentSearches = [], onQuickSearch }: Lan
       />
 
       {/* Route map background decoration */}
-      <div className={`fixed top-[15%] left-0 right-0 opacity-0 transition-opacity [transition-duration:2000ms] ${mounted ? 'opacity-100' : ''}`}>
+      <div className={`fixed top-[15%] left-0 right-0 opacity-0 transition-opacity duration-1000 ${mounted ? 'opacity-100' : ''}`}>
         <RouteMapDecoration variant="hero" className="w-full h-auto" />
       </div>
 
@@ -145,7 +145,7 @@ export function LandingHero({ onStart, recentSearches = [], onQuickSearch }: Lan
               textShadow: '0 0 60px hsl(40 45% 60% / 0.15)',
             }}
           >
-            Get to the airport on time.
+            Less rush. More runway.
           </h1>
 
           {/* Airplane motion divider */}
@@ -161,7 +161,7 @@ export function LandingHero({ onStart, recentSearches = [], onQuickSearch }: Lan
 
           {/* Secondary line - one sentence, smaller, muted */}
           <p className="text-muted-foreground text-base md:text-lg leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            A precise exit plan based on your airport, flight, and risk.
+            Three quick steps. One clear departure plan. Build in time for the things Maps can’t see.
           </p>
 
           {/* Route map section divider */}
@@ -180,19 +180,23 @@ export function LandingHero({ onStart, recentSearches = [], onQuickSearch }: Lan
             {/* Shimmer sweep on hover */}
             <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             <Sparkles className="w-5 h-5 group-hover:rotate-12 group-hover:scale-110 transition-transform duration-300" />
-            Show me when to leave
+            Plan my departure
           </Button>
 
+          <div className="grid grid-cols-3 gap-3 mt-5 text-center text-xs text-muted-foreground" aria-label="Planning steps">
+            <span><span className="block text-primary font-mono mb-1">01</span>Your flight</span>
+            <span><span className="block text-primary font-mono mb-1">02</span>Your journey</span>
+            <span><span className="block text-primary font-mono mb-1">03</span>Your runway</span>
+          </div>
           {/* Recent searches */}
           {recentSearches.length > 0 && (
             <div className="mt-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
               <div className="flex items-center gap-2 mb-3">
                 <History className="w-4 h-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground uppercase tracking-wider">Recent</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-wider">Plan again</span>
               </div>
               <div className="space-y-2">
                 {recentSearches.slice(0, 3).map((search, index) => {
-                  const { profile } = getAirportProfile(search.airport);
                   return (
                     <button
                       key={search.id}
@@ -224,10 +228,11 @@ export function LandingHero({ onStart, recentSearches = [], onQuickSearch }: Lan
       </main>
 
       {/* Subtle credibility line - very small, near bottom */}
-      <footer className="pb-[calc(2rem+env(safe-area-inset-bottom))] px-6 relative z-10">
+      <footer className="pb-8 px-6 relative z-10">
+        <div className="text-center mb-3"><Link to="/privacy" className="text-xs text-muted-foreground inline-block py-3">Privacy & saved plans</Link></div>
         <JetTrailDivider className="mb-4 opacity-40" />
         <p className="text-center text-xs text-muted-foreground/70 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-          Airport-specific logic. Real buffers. No guessing.
+          Airport-specific estimates. Thoughtful buffers. Ready when you are.
         </p>
       </footer>
     </div>
