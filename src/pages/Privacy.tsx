@@ -4,7 +4,7 @@ import { clearRecentSearches } from "@/lib/recentSearches";
 import { clearAirportPreferences } from "@/lib/airportPreferences";
 export default function Privacy() {
   const [preferencesMessage, setPreferencesMessage] = useState("");
-  const [cleared, setCleared] = useState(false);
+  const [clearMessage, setClearMessage] = useState("");
   return (
     <main className="container max-w-lg py-8 pt-safe space-y-5">
       <Link to="/" className="inline-block py-4 text-primary">
@@ -28,13 +28,14 @@ export default function Privacy() {
       <button
         className="rounded-xl border border-border p-4"
         onClick={() => {
-          clearRecentSearches();
-          setCleared(true);
+          setClearMessage(clearRecentSearches()
+            ? "Recent plans cleared on this device."
+            : "Could not clear recent plans. Try clearing app or browser data.");
         }}
       >
         Clear recent plans
       </button>
-      {cleared && <p role="status">Recent plans cleared on this device.</p>}
+      {clearMessage && <p role="status">{clearMessage}</p>}
       <button className="rounded-xl border border-border p-4" onClick={() => {
         if (clearAirportPreferences()) setPreferencesMessage("Saved airport preferences cleared.");
         else setPreferencesMessage("Could not clear preferences. Try clearing app or browser data.");

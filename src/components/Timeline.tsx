@@ -303,14 +303,8 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
                       backgroundImage: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary)))',
                     }}
                   />
-                  {/* Traveling dot on mini timeline */}
-                  <div
-                    className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_hsl(var(--cyan)_/_0.5)]"
-                    style={{
-                      animation: 'shimmer 3s linear infinite',
-                      left: '50%',
-                    }}
-                  />
+                  {/* Traveling dot that actually glides across the mini timeline */}
+                  <div className="absolute top-1/2 w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_hsl(var(--cyan)_/_0.5)] animate-travel-dot" />
                 </div>
                 <span>Depart</span>
               </div>

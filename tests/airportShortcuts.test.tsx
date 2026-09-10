@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { expect, it, vi, beforeEach } from 'vitest';
 import { Geolocation } from '@capacitor/geolocation';
 import { AirportShortcuts } from '../src/components/AirportShortcuts';
+import { MemoryRouter } from 'react-router-dom';
+import Privacy from '../src/pages/Privacy';
 import { FlightForm } from '../src/components/FlightForm';
 import { saveAirportPreference } from '../src/lib/airportPreferences';
 vi.mock('@capacitor/geolocation', () => ({ Geolocation: { getCurrentPosition: vi.fn() } }));
@@ -36,4 +38,14 @@ it('starts new plans with the saved default airport', () => {
   saveAirportPreference('defaultAirport', 'LAX');
   render(<FlightForm onSubmit={vi.fn()} />);
   expect(screen.getByLabelText('Departure airport')).toHaveValue('LAX');
+});
+
+it('does not report cleared plans when the device refuses deletion', async () => {
+  const remove = vi.spyOn(localStorage, 'removeItem').mockImplementation(() => { throw new Error('blocked'); });
+  const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+  try {
+    render(<MemoryRouter><Privacy /></MemoryRouter>);
+    await userEvent.click(screen.getByRole('button', { name: 'Clear recent plans' }));
+    expect(screen.getByRole('status')).toHaveTextContent('Could not clear recent plans');
+  } finally { remove.mockRestore(); log.mockRestore(); }
 });

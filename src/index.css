@@ -73,11 +73,23 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Avoid rubber-band white flashes past the dark background on iOS. */
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     letter-spacing: 0.02em;
+  }
+}
+
+/* Use the dynamic viewport height where supported so layouts aren't cut off by
+   mobile browser chrome (address bar / home indicator). Declared UNLAYERED so it
+   reliably beats Tailwind's layered `.min-h-screen` (normal CSS wins over @layer). */
+@supports (min-height: 100dvh) {
+  .min-h-screen {
+    min-height: 100dvh;
   }
 }
 
@@ -231,6 +243,30 @@
 }
 
 @layer utilities {
+  /* Safe-area insets for notched devices / standalone PWA & Capacitor shells.
+     Each adds the device inset ON TOP of any padding already applied via the
+     box model, so combine with regular padding utilities as needed. */
+  .pt-safe {
+    padding-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  }
+
+  .pb-safe {
+    padding-bottom: max(12px, var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
+  }
+
+  .pl-safe {
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .pr-safe {
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* Guarantee the last interactive row clears the home indicator. */
+  .mb-safe {
+    margin-bottom: env(safe-area-inset-bottom);
+  }
+
   /* Base animations */
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out forwards;
@@ -569,6 +605,51 @@
   .focus-ring:focus {
     animation: focusRing 0.3s ease forwards;
   }
+
+  /* Dot that actually traverses a horizontal track (left -> right and back).
+     The previous mini-timeline dot used the shimmer keyframe, which only moves
+     background-position and left a solid dot visually frozen. */
+  @keyframes travelDot {
+    0% {
+      left: 0%;
+      transform: translate(0, -50%);
+    }
+    50% {
+      left: 100%;
+      transform: translate(-100%, -50%);
+    }
+    100% {
+      left: 0%;
+      transform: translate(0, -50%);
+    }
+  }
+
+  .animate-travel-dot {
+    animation: travelDot 3s ease-in-out infinite;
+  }
+
+  /* Marching dashed flight path (replaces a per-frame JS requestAnimationFrame
+     loop). Each path sets --dash-end to its dash+gap period for a seamless loop. */
+  @keyframes routeDash {
+    to {
+      stroke-dashoffset: var(--dash-end, -20px);
+    }
+  }
+}
+
+/* Respect users who prefer reduced motion: keep meaning, drop the motion.
+   Looping/decorative animations collapse to a near-instant state while one-shot
+   entrance animations still resolve to their final (visible) frame. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Mobile surfaces, visible keyboard focus, and accessible motion. */
@@ -577,10 +658,5 @@ body { min-width: 320px; margin: 0; }
 button, a, input, select { touch-action: manipulation; }
 button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 4px; }
 input, select { font-size: 16px; }
-.pt-safe { padding-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px)); }
-.pb-safe { padding-bottom: max(12px, var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))); }
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
-}
 
 body { padding-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px)); padding-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px)); padding-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)); }

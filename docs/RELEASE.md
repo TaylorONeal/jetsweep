@@ -18,7 +18,7 @@ Prepared on 2026-09-10. This repository is **not yet a store submission**.
 
 Android adaptive/legacy icons and iOS app icons/splashes were generated with `@capacitor/assets`
 from the existing `resources/icon.png`. Review the artwork on devices; the source is 512px and
-the iOS 1024px icon is upscaled. Four reproducible browser preview screenshots are included in `release-assets/screenshots`.
+the iOS 1024px icon is upscaled. Five reproducible browser preview screenshots are included in `release-assets/screenshots`.
 Replace them with captures from the final native build for submission; a feature graphic is
 still needed.
 
@@ -49,7 +49,7 @@ npm run cap:android
 ```
 
 The GitHub Actions workflow checks the web app, runs Android lint, and builds a debug APK
-and unsigned release bundle with a provisioned Android SDK. It retains artifacts and lint reports. It has been added locally; it has not been run on GitHub in this session.
+and unsigned release bundle with a provisioned Android SDK. It retains artifacts and lint reports. Remote results are available in the repository’s Actions checks.
 
 For Play release, open Android Studio and use Generate Signed Bundle / APK → Android App
 Bundle. Create or choose the publisher's upload key outside the repository. Store credentials

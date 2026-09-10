@@ -107,7 +107,7 @@ export function LandingHero({ onStart, recentSearches = [], onQuickSearch }: Lan
       <ParticleField />
 
       {/* App name - top, small but confident */}
-      <header className="pt-12 px-6 flex items-center justify-between relative z-10">
+      <header className="pt-[calc(3rem+env(safe-area-inset-top))] px-6 flex items-center justify-between relative z-10">
         <div className="flex items-center gap-2 group cursor-default">
           <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-all duration-500 group-hover:shadow-[0_0_20px_hsl(var(--gold)_/_0.2)]">
             <Plane className="w-4 h-4 text-primary group-hover:rotate-[-15deg] transition-transform duration-500" />

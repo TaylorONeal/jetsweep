@@ -39,7 +39,7 @@ jobs:
       - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
       - run: npm ci
       - run: npm run android:debug
-      - run: ./gradlew :app:lintDebug :app:bundleRelease --console=plain
+      - run: ./gradlew :app:assembleDebugAndroidTest :app:lintDebug :app:bundleRelease --console=plain
         working-directory: android
       - uses: actions/upload-artifact@v4
         with:

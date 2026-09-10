@@ -5,7 +5,7 @@ calculation → departure timeline → edit/reuse saved trip. No API or database
 
 ## Automated coverage
 
-- 53 unit/form tests: departure-window bounds across airports, buffer preferences, and
+- 54 unit/form tests: departure-window bounds across airports, buffer preferences, and
   transport modes; ordered timeline stages; bags/family/international offsets; overdue
   plans; invalid inputs; local dates; Thanksgiving; corrupted storage; full wizard submission
   and retained options when going back; traffic at road time and peak overlap; airport
@@ -14,14 +14,14 @@ calculation → departure timeline → edit/reuse saved trip. No API or database
   saved/default persistence and real browser geolocation suggestions,
   browser Back, horizontal overflow, JavaScript errors, and offline reload.
 - GitHub Actions: web checks, both browser engines, Android lint, debug APK, and unsigned
-  release bundle. Added,
-  but not executed remotely in this session.
+  release bundle, and device-test APK compilation. Remote results are recorded in the
+  repository’s Actions checks.
 
 ## Local results
 
 - TypeScript checks: passed.
 - ESLint: passed with seven existing Fast Refresh warnings in shared UI primitives.
-- Unit/form tests: 53 passed.
+- Unit/form tests: 54 passed.
 - Web production build: passed; PWA cache generated.
 - Native web build and platform scaffolding: passed.
 - npm audit: zero reported vulnerabilities after dependency updates.
@@ -60,3 +60,11 @@ store pre-launch/TestFlight checks, and final artwork review are not covered by 
 emulation. Android compilation is verified; runtime/device behavior and store release are not.
 
 See [release checklist](RELEASE.md) for setup and publishing steps.
+
+## Merge verification
+
+Integrated upstream main timing/accessibility fixes before merge. The generated Android
+instrumentation smoke test now checks the actual `com.jetsweep.app` package identity.
+Device execution remains pending; `assembleDebugAndroidTest` compilation passed.
+
+Privacy deletion also checks storage failures before reporting success.

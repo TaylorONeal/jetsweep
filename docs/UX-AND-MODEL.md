@@ -44,3 +44,7 @@ Airline check-in, bag-drop, and boarding cutoffs must be checked separately.
 - Native builds disable PWA service-worker generation to prevent stale web bundles.
 
 Airport defaults and location suggestions are documented in [Airport selection](AIRPORT-SELECTION.md).
+
+Integration retains upstream revised airport buffer ranges, risk weights, and pickup timing.
+The upstream full-budget accumulation includes gate cushion and boarding offset; actual-drive
+rush-hour classification and original overdue timestamps remain applied.

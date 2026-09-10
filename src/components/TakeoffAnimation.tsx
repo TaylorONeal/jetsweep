@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Plane } from 'lucide-react';
 
 interface TakeoffAnimationProps {
@@ -34,6 +34,14 @@ export function TakeoffAnimation({ onComplete, airportCode = 'JFK' }: TakeoffAni
   const [clouds, setClouds] = useState<Cloud[]>([]);
   const [engineGlow, setEngineGlow] = useState(0.3);
   const [showText, setShowText] = useState(true);
+
+  // Guard so skip + the scheduled completion can't both fire onComplete.
+  const completedRef = useRef(false);
+  const finish = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    onComplete();
+  }, [onComplete]);
 
   // Generate initial clouds
   useEffect(() => {
@@ -104,6 +112,17 @@ export function TakeoffAnimation({ onComplete, airportCode = 'JFK' }: TakeoffAni
 
   // Animation phases
   useEffect(() => {
+    // Honor reduced-motion: skip the cinematic sequence and resolve almost
+    // immediately so the user lands on their timeline without forced motion.
+    const prefersReduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReduced) {
+      const t = setTimeout(finish, 450);
+      return () => clearTimeout(t);
+    }
+
     const timeline = [
       { delay: 0, action: () => setPhase('taxiing') },
       { delay: 400, action: () => setShowText(false) },
@@ -112,7 +131,7 @@ export function TakeoffAnimation({ onComplete, airportCode = 'JFK' }: TakeoffAni
       { delay: 1800, action: () => setPhase('liftoff') },
       { delay: 2400, action: () => setPhase('climbing') },
       { delay: 3200, action: () => setPhase('done') },
-      { delay: 3400, action: onComplete },
+      { delay: 3400, action: finish },
     ];
 
     const timeouts = timeline.map(({ delay, action }) =>
@@ -120,7 +139,7 @@ export function TakeoffAnimation({ onComplete, airportCode = 'JFK' }: TakeoffAni
     );
 
     return () => timeouts.forEach(clearTimeout);
-  }, [onComplete]);
+  }, [finish]);
 
   // Plane movement based on phase
   useEffect(() => {
@@ -204,7 +223,16 @@ export function TakeoffAnimation({ onComplete, airportCode = 'JFK' }: TakeoffAni
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-background overflow-hidden">
+    <div
+      className="fixed inset-0 z-50 bg-background overflow-hidden cursor-pointer"
+      onClick={finish}
+      role="button"
+      tabIndex={0}
+      aria-label="Skip takeoff animation"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') finish();
+      }}
+    >
       {/* Sky gradient */}
       <div
         className="absolute inset-0"
@@ -416,7 +444,7 @@ export function TakeoffAnimation({ onComplete, airportCode = 'JFK' }: TakeoffAni
       </div>
 
       {/* Phase indicator */}
-      <div className="absolute top-8 right-8 text-right">
+      <div className="absolute top-[calc(2rem+env(safe-area-inset-top))] right-8 text-right">
         <p className="text-xs text-muted-foreground/50 uppercase tracking-widest">
           {phase === 'taxiing' && 'Taxi'}
           {phase === 'accelerating' && 'Throttle Up'}
@@ -424,6 +452,11 @@ export function TakeoffAnimation({ onComplete, airportCode = 'JFK' }: TakeoffAni
           {phase === 'climbing' && 'Climbing'}
         </p>
       </div>
+
+      {/* Skip affordance */}
+      <p className="absolute bottom-[calc(1.5rem+env(safe-area-inset-bottom))] right-6 text-[10px] uppercase tracking-widest text-muted-foreground/40">
+        Tap to skip
+      </p>
     </div>
   );
 }

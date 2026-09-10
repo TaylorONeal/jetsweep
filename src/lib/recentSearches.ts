@@ -83,11 +83,13 @@ export function getRecentSearches(): RecentSearch[] {
   }
 }
 
-export function clearRecentSearches(): void {
+export function clearRecentSearches(): boolean {
   try {
     localStorage.removeItem(STORAGE_KEY);
+    return true;
   } catch (e) {
     console.error("Failed to clear recent searches:", e);
+    return false;
   }
 }
 
