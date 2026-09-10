@@ -66,7 +66,7 @@ const HOLIDAY_PERIODS: {
       const thanksgiving = getNthWeekdayOfMonth(year, 10, 4, 4); // 4th Thursday of November
       const daysBefore = getDaysDiff(date, thanksgiving);
       // Sunday before through Wednesday = EXTREME
-      if (daysBefore >= 0 && daysBefore <= 4) return true;
+      if (daysBefore >= 1 && daysBefore <= 4) return true;
       return false;
     },
     severity: 'extreme',
@@ -283,7 +283,7 @@ const HOLIDAY_PERIODS: {
 function getNthWeekdayOfMonth(year: number, month: number, weekday: number, n: number): Date {
   const firstDay = new Date(year, month, 1);
   const firstWeekday = firstDay.getDay();
-  let day = 1 + ((weekday - firstWeekday + 7) % 7) + (n - 1) * 7;
+  const day = 1 + ((weekday - firstWeekday + 7) % 7) + (n - 1) * 7;
   return new Date(year, month, day);
 }
 
@@ -322,8 +322,21 @@ function detectHoliday(date: Date): HolidayImpact | null {
   return null;
 }
 
-export function analyzeTravelConditions(departureDateTime: Date): TravelConditions {
-  const rushHour = detectRushHour(departureDateTime);
+export function analyzeTravelConditions(
+  departureDateTime: Date,
+  roadWindow?: { start: Date; end: Date },
+): TravelConditions {
+  let rushHour = detectRushHour(roadWindow?.start ?? departureDateTime);
+  if (roadWindow) {
+    const severityRank = { none: 0, moderate: 1, heavy: 2 };
+    // Include both endpoints and any rush-hour boundary crossed during the drive.
+    for (let time = roadWindow.start.getTime(); time <= roadWindow.end.getTime(); time += 60000) {
+      const sample = detectRushHour(new Date(time));
+      if (severityRank[sample.severity] > severityRank[rushHour.severity]) rushHour = sample;
+    }
+    const end = detectRushHour(roadWindow.end);
+    if (severityRank[end.severity] > severityRank[rushHour.severity]) rushHour = end;
+  }
   const holidayImpact = detectHoliday(departureDateTime);
 
   const notes: string[] = [];

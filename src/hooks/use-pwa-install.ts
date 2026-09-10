@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import { useState, useEffect } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -12,7 +13,7 @@ export function usePWAInstall() {
 
   useEffect(() => {
     // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    if (Capacitor.isNativePlatform() || window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
       return;
     }
@@ -41,6 +42,7 @@ export function usePWAInstall() {
   const install = async () => {
     if (!deferredPrompt) return false;
 
+    setIsInstallable(false);
     await deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
 

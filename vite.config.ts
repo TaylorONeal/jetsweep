@@ -4,7 +4,7 @@ import path from "path";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode: _mode }) => ({
+export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
@@ -13,11 +13,12 @@ export default defineConfig(({ mode: _mode }) => ({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      disable: mode === "native",
       includeAssets: ["favicon.ico"],
       manifest: {
         name: "JetSweep – When to leave for the airport",
         short_name: "JetSweep",
-        description: "A precise exit plan based on your airport, flight, and risk.",
+        description: "A buffered departure plan based on your airport, flight, and travel needs.",
         theme_color: "#0a0a0a",
         background_color: "#0a0a0a",
         display: "standalone",

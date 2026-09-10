@@ -40,7 +40,7 @@ const About = () => {
                 <p className="text-muted-foreground leading-relaxed">
                   "When should I leave for the airport?" is a question with too many variables—security type, 
                   airport size, checked bags, traffic, holidays. JetSweep calculates backward from your departure 
-                  time using airport-specific data to give you a precise leave time.
+                  time using airport-specific data to build an estimated departure plan.
                 </p>
               </div>
             </div>
@@ -60,8 +60,7 @@ const About = () => {
                 <div>
                   <h3 className="font-medium text-foreground">Select your airport</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    We have specific data for the top 25 US airports—walk distances, security wait multipliers, 
-                    parking patterns, and more.
+                    We use airport-specific planning estimates and tier defaults for US airports, including terminal walks and security buffers. Parking is not included.
                   </p>
                 </div>
               </div>

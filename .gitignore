@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Native credentials and test artifacts
+*.jks
+*.keystore
+keystore.properties
+playwright-report/
+test-results/

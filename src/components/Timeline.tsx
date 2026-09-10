@@ -1,4 +1,6 @@
-import { TimelineResult, formatTime, StressLevel } from '@/lib/timeline';
+import { formatCountdown } from '@/lib/timeDisplay';
+import { useEffect, useState } from 'react';
+import { TimelineResult, formatTime, formatTimeRangeDisplay, StressLevel } from '@/lib/timeline';
 import { TimelineCard } from './TimelineCard';
 import { StressMarginMeter } from './StressMarginMeter';
 import { HeadsUpCallout } from './HeadsUpCallout';
@@ -34,11 +36,19 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
     confidence,
     airportProfile,
     isAirportEstimate,
-    isLeaveNow,
+
     stressMargin,
     stressLevel,
   } = result;
 
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 15000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const isLeaveNow = leaveTime.getTime() <= now;
+  const departed = flightTime.getTime() <= now;
+  const minutesLeft = Math.max(0, Math.ceil((leaveTime.getTime() - now) / 60000));
   const confidenceConfig = {
     'normal': {
       icon: CheckCircle2,
@@ -97,8 +107,8 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b border-border">
-        <div className="container py-4">
+      <header className="pt-safe top-0 z-20 bg-background/80 backdrop-blur-lg border-b border-border">
+        <div className="container max-w-2xl py-4">
           <button
             onClick={onBack}
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-300 mb-4 group"
@@ -107,22 +117,24 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
             <span className="text-sm relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-primary after:transition-all after:duration-300 group-hover:after:w-full">Edit Details</span>
           </button>
 
+          <p className="text-center text-xs uppercase tracking-[0.2em] text-primary mb-4 flex justify-center items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Departure plan ready</p>
           {/* Leave time hero */}
           <div className="text-center">
+            <p className="text-xs text-muted-foreground mb-2">{leaveTime.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })} · {Intl.DateTimeFormat().resolvedOptions().timeZone}</p>
             {isLeaveNow ? (
               <div className="animate-pulse-soft">
                 <p className="text-amber-400 text-sm font-medium uppercase tracking-wider mb-1">
-                  Leave Now
+                  {departed ? "Flight time has passed" : "Planned start time has passed"}
                 </p>
                 <h1 className="font-display text-4xl font-bold text-primary animate-glow-pulse">
-                  Time to Go!
+                  {departed ? "Update your flight" : "Check your options"}
                 </h1>
               </div>
             ) : (
               <>
                 <p className="text-muted-foreground text-sm uppercase tracking-wider mb-1 flex items-center justify-center gap-2">
                   <MapPin className="w-3 h-3" />
-                  Leave by
+                  {stages[0].id === 'call' ? 'Request your ride at' : 'Leave by'}
                 </p>
                 <h1
                   className="font-display text-5xl font-bold text-primary tracking-tight animate-scale-in"
@@ -133,12 +145,12 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
                   {formatTime(leaveTime)}
                 </h1>
                 <p className="text-muted-foreground text-xs mt-2 animate-fade-in">
-                  Window: {formatTime(leaveTimeWindow.earliest)} – {formatTime(leaveTimeWindow.latest)}
+                  Window: {formatTimeRangeDisplay(leaveTimeWindow.earliest, leaveTimeWindow.latest)}
                 </p>
               </>
             )}
 
-            <div className="flex items-center justify-center gap-3 mt-4">
+            <div className="flex items-center justify-center flex-wrap gap-3 mt-4">
               <div className="flex items-center gap-1.5 text-muted-foreground text-sm px-3 py-1.5 rounded-full bg-secondary/50 hover:bg-secondary transition-colors duration-300">
                 <Plane className="w-4 h-4 text-primary" />
                 <span>Departs {formatTime(flightTime)}</span>
@@ -152,10 +164,16 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
         </div>
       </header>
 
-      <main className="container py-6">
+      <main className="container max-w-2xl py-6">
         {/* Route map decoration between header and content */}
         <div className="mb-6 animate-fade-in">
           <RouteMapDecoration variant="section" className="w-full h-10 opacity-50" />
+        </div>
+
+        <div className="rounded-2xl border border-primary/25 bg-primary/5 p-5 mb-5">
+          <h2 className="text-lg">Your next move</h2>
+          <p className="text-sm text-muted-foreground mt-2">{departed ? 'This plan is out of date. Edit the departure time before using it.' : isLeaveNow ? 'The original plan starts in the past. Check current traffic and your airline’s deadlines; the displayed buffer is no longer available in full.' : `Start in ${formatCountdown(minutesLeft)}. Confirm your route and have your travel documents ready.`}</p>
+          <p className="text-xs text-muted-foreground mt-3">Estimates only. Boarding times and airline cutoffs vary.</p>
         </div>
 
         {/* Summary Card */}
@@ -182,7 +200,7 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
                 stress.bg, stress.border, stress.glow
               )}>
                 <span className={cn("text-sm font-medium", stress.color)}>{stress.label}</span>
-                <span className="text-xs text-muted-foreground">({stressMargin} min buffer)</span>
+                <span className="text-xs text-muted-foreground">({stressMargin} min planned buffer)</span>
               </div>
 
               {/* Airport badge */}
@@ -259,7 +277,7 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
             <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/30 group-hover:shadow-[0_0_25px_hsl(var(--gold)_/_0.2)] transition-all duration-500">
               <Plane className="w-6 h-6 text-primary group-hover:rotate-[-15deg] transition-transform duration-500" />
             </div>
-            <p className="text-muted-foreground text-sm mb-2">Recommended Leave Time</p>
+            <p className="text-muted-foreground text-sm mb-2">Planned Start Time</p>
             <p
               className="font-display text-3xl font-bold text-primary"
               style={{
@@ -294,7 +312,7 @@ export function Timeline({ result, flightTime, onBack }: TimelineProps) {
                     }}
                   />
                 </div>
-                <span>Board</span>
+                <span>Depart</span>
               </div>
               <div className="flex items-center justify-between text-xs mt-1">
                 <span className="text-primary font-mono">{formatTime(leaveTime)}</span>
