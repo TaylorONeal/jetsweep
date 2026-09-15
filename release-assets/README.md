@@ -18,3 +18,7 @@ Set `JETSWEEP_PREVIEW_URL` for a different local preview. Publisher metadata is 
 The binaries remain in ignored `android/app/build/outputs/` directories; regenerate them
 with `npm run android:debug` and `npm run android:bundle`. These are build artifacts, not
 proof of physical-device testing or store approval.
+
+September 15: new Android legacy/adaptive/themed icons and Play graphics are reproducible
+with `node scripts/prepare-android-artwork.mjs`. Store sources and ISC license are in `store/`.
+The unsigned candidate, checksums, QA packet and evidence are in ignored `candidates/2026-09-15/`.

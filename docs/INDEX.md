@@ -9,3 +9,6 @@
 - [Pre-release screenshots and capture instructions](../release-assets/README.md)
 
 - [Location suggestions, saved airports, and coordinate provenance](AIRPORT-SELECTION.md)
+
+- [Android reviewer/store packet](ANDROID-REVIEWER-PACKET.md)
+- [Physical-device acceptance record](ANDROID-DEVICE-QA.md)

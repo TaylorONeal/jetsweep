@@ -1,3 +1,4 @@
+import { isSupportedAirport } from './flightValidation';
 import type { FlightInputs } from "./timeline";
 import { z } from "zod";
 
@@ -74,7 +75,7 @@ export function getRecentSearches(): RecentSearch[] {
     return parsed
       .flatMap((item) => {
         const result = schema.safeParse(item);
-        return result.success ? [result.data as RecentSearch] : [];
+        return result.success && isSupportedAirport(result.data.airport) ? [result.data as RecentSearch] : [];
       })
       .slice(0, MAX_SEARCHES);
   } catch (e) {

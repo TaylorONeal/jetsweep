@@ -1,4 +1,22 @@
-# Verification — 2026-09-10
+# Current release verification — 2026-09-15
+
+- 56 unit/form tests passed; TypeScript and ESLint passed (7 existing warnings).
+- 10 Chromium/WebKit tests passed, including nonexistent New York DST time rejection,
+  saved defaults/recent trips, denied location (unit coverage), and real origin outage.
+- Android debug APK, unsigned release AAB, device-test APK and lint passed.
+- Debug APK signature verifies; release AAB is unsigned. APK identity/API metadata checked.
+- Android lint: 0 errors, 18 warnings (remaining template resources, splash-density and
+  version notices). Legacy icon shape and missing monochrome warnings are resolved.
+- No attached device: actual Android/permission/installation QA is NOT EXECUTED.
+- Xcode license acceptance is now pending; Android did not require accepting it.
+- Base upstream remains 9550c02; this preparation has not been pushed or merged.
+- Candidate hashes, logs and source revision are in `release-assets/candidates/2026-09-15/`.
+
+See [reviewer packet](ANDROID-REVIEWER-PACKET.md) and [device record](ANDROID-DEVICE-QA.md).
+
+---
+
+# Historical verification — 2026-09-10
 
 The tested story is Home → flight details → journey options → review → local timing
 calculation → departure timeline → edit/reuse saved trip. No API or database is involved.

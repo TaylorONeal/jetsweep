@@ -2,7 +2,7 @@
 import { formatCountdown } from '../src/lib/timeDisplay';
 import { describe, expect, it } from "vitest";
 import { computeTimeline, FlightInputs } from "../src/lib/timeline";
-import { validateFlight, toLocalDate } from "../src/lib/flightValidation";
+import { validateFlight, toLocalDate, parseLocalDeparture } from "../src/lib/flightValidation";
 import { getRecentSearches, saveRecentSearch } from "../src/lib/recentSearches";
 import { analyzeTravelConditions } from "../src/lib/travelConditions";
 const base: FlightInputs = {
@@ -139,4 +139,15 @@ it('formats future-trip countdowns in days and clamps overdue values', () => {
   expect(formatCountdown(1500)).toBe('1d 1h');
   expect(formatCountdown(125)).toBe('2h 5m');
   expect(formatCountdown(-10)).toBe('0m');
+});
+
+it('rejects unknown airports and rolled-over calendar inputs', () => {
+  expect(validateFlight({ ...base, airport: 'NOT_REAL' }, now)).toContain('Choose your departure airport');
+  expect(Number.isNaN(parseLocalDeparture('2030-02-31', '12:00').getTime())).toBe(true);
+  expect(Number.isNaN(parseLocalDeparture('2030-06-10', '24:30').getTime())).toBe(true);
+  expect(parseLocalDeparture('2030-06-10', '12:30').getHours()).toBe(12);
+});
+it('ignores saved trips with unsupported airport codes', () => {
+  saveRecentSearch({ airport: 'NOT_REAL', airportName: 'Invalid', tripType: 'domestic', leaveTime: '2030-01-01T10:00:00Z', flightTime: '2030-01-01T12:00:00Z' });
+  expect(getRecentSearches()).toEqual([]);
 });

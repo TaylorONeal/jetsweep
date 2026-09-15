@@ -16,7 +16,7 @@ import {
 import { AirportShortcuts } from "@/components/AirportShortcuts";
 import { preferredAirport, saveAirportPreference } from "@/lib/airportPreferences";
 import { Button } from "@/components/ui/button";
-import { toLocalDate, validateFlight } from "@/lib/flightValidation";
+import { toLocalDate, validateFlight, parseLocalDeparture } from "@/lib/flightValidation";
 
 interface FlightFormProps {
   onSubmit: (inputs: FlightInputs) => void;
@@ -111,7 +111,7 @@ export function FlightForm({ onSubmit, initialInputs }: FlightFormProps) {
   const advance = () => {
     const next = {
       ...inputs,
-      departureDateTime: new Date(`${date}T${time}`),
+      departureDateTime: parseLocalDeparture(date, time),
       driveTime: Number(drive),
     };
     const message = validateFlight(next);

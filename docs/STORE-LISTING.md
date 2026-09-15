@@ -38,7 +38,7 @@ Car estimates cover curbside drop-off; parking and shuttle time are not included
 - Real support email and public support/privacy-policy URLs.
 - Store category, target audience, content-rating questionnaire, and data-safety answers.
 - Reviewed screenshots from a release candidate on supported devices.
-- Google Play feature graphic and final icon quality review.
+- Final device artwork approval. Play icon and feature graphic are prepared in `release-assets/store/`.
 
 ## Screenshot brief
 
