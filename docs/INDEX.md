@@ -12,3 +12,5 @@
 
 - [Android reviewer/store packet](ANDROID-REVIEWER-PACKET.md)
 - [Physical-device acceptance record](ANDROID-DEVICE-QA.md)
+
+- [Independent hosting and platform cleanup](INDEPENDENT-HOSTING.md)

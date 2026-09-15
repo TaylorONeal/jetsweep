@@ -120,3 +120,11 @@ Physical-device airplane-mode testing remains required.
 No signing keys, publisher accounts, or store submissions were created or modified.
 
 Reference: [Capacitor 8 migration/toolchain requirements](https://capacitorjs.com/docs/updating/8-0).
+
+### Superseding independent candidate
+
+Use `release-assets/candidates/2026-09-15-independent/` and its manifest for the
+new branding-clean build. The original September 15 candidate is superseded.
+See [independent hosting](INDEPENDENT-HOSTING.md) for the cleanup and migration
+limits. Native lint now reports 0 errors / 28 warnings. Publisher, signing,
+physical-device and iOS toolchain gates remain unchanged.

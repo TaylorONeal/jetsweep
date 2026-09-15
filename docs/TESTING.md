@@ -86,3 +86,12 @@ instrumentation smoke test now checks the actual `com.jetsweep.app` package iden
 Device execution remains pending; `assembleDebugAndroidTest` compilation passed.
 
 Privacy deletion also checks storage failures before reporting success.
+
+## Independent branding candidate (September 15)
+
+The platform cleanup retains 56 passing unit/form tests and 10 passing browser
+checks. Android debug, unsigned release bundle and instrumentation APK rebuilt;
+lint: 0 errors, 28 warnings after consistent day/night splash generation.
+Browser favicon and image evidence, new hashes, and logs are in
+`release-assets/candidates/2026-09-15-independent/`. No physical-device QA or iOS
+compile was performed. This supersedes the earlier artwork candidate.

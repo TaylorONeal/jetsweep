@@ -7,13 +7,13 @@
   "artifacts": [
     {
       "path": "android/app/build/outputs/apk/debug/app-debug.apk",
-      "bytes": 9001300,
-      "sha256": "0902d47d5b19a0e2e60e575382a38f051f9181bf31f653d4832e029209b12449"
+      "bytes": 9001296,
+      "sha256": "83731ddcc09536ef7d6942eedac69ad0acd776d8e0c9df58c0d35b30d25671cb"
     },
     {
       "path": "android/app/build/outputs/bundle/release/app-release.aab",
-      "bytes": 4187749,
-      "sha256": "c1a590c3e53e6f396394836ec959d05148bf3618abd0a7198845503ac6071233"
+      "bytes": 3845762,
+      "sha256": "ce121ff9aae35f4cf466bb8b85cab255ba70cd5aa9b67b4ea550d81119f86f6e"
     }
   ],
   "features": [
@@ -21,5 +21,6 @@
     "saved-default-airport",
     "recent-airport-fallback"
   ],
-  "publisherIdentityVerified": false
+  "publisherIdentityVerified": false,
+  "candidate": "2026-09-15-independent"
 }
