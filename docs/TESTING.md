@@ -108,3 +108,10 @@ compile was performed. This supersedes the earlier artwork candidate.
 - Seven refreshed 1080x1920 mobile-web draft previews visually inspected. They are
   viewport captures with scrollable content, not final native store screenshots.
 - adb still lists no devices; Android emulator/system images are not installed.
+
+## Hosted Android CI repair (September 16)
+
+The setup action's default `tools platform-tools` package list failed because the
+obsolete `tools` package is no longer available. Explicitly request platform-tools
+and use the runner's existing accepted SDK licenses; disable automatic acceptance
+of additional SDK agreements. The prior failure occurred before app compilation.
