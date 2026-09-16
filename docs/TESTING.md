@@ -1,4 +1,22 @@
-# Verification — 2026-09-10
+# Current release verification — 2026-09-15
+
+- 56 unit/form tests passed; TypeScript and ESLint passed (7 existing warnings).
+- 10 Chromium/WebKit tests passed, including nonexistent New York DST time rejection,
+  saved defaults/recent trips, denied location (unit coverage), and real origin outage.
+- Android debug APK, unsigned release AAB, device-test APK and lint passed.
+- Debug APK signature verifies; release AAB is unsigned. APK identity/API metadata checked.
+- Android lint: 0 errors, 18 warnings (remaining template resources, splash-density and
+  version notices). Legacy icon shape and missing monochrome warnings are resolved.
+- No attached device: actual Android/permission/installation QA is NOT EXECUTED.
+- Xcode license acceptance is now pending; Android did not require accepting it.
+- Base upstream remains 9550c02; this preparation has not been pushed or merged.
+- Candidate hashes, logs and source revision are in `release-assets/candidates/2026-09-15/`.
+
+See [reviewer packet](ANDROID-REVIEWER-PACKET.md) and [device record](ANDROID-DEVICE-QA.md).
+
+---
+
+# Historical verification — 2026-09-10
 
 The tested story is Home → flight details → journey options → review → local timing
 calculation → departure timeline → edit/reuse saved trip. No API or database is involved.
@@ -68,3 +86,32 @@ instrumentation smoke test now checks the actual `com.jetsweep.app` package iden
 Device execution remains pending; `assembleDebugAndroidTest` compilation passed.
 
 Privacy deletion also checks storage failures before reporting success.
+
+## Independent branding candidate (September 15)
+
+The platform cleanup retains 56 passing unit/form tests and 10 passing browser
+checks. Android debug, unsigned release bundle and instrumentation APK rebuilt;
+lint: 0 errors, 28 warnings after consistent day/night splash generation.
+Browser favicon and image evidence, new hashes, and logs are in
+`release-assets/candidates/2026-09-15-independent/`. No physical-device QA or iOS
+compile was performed. This supersedes the earlier artwork candidate.
+
+## September 16 follow-up
+
+- `npm run check`: 56 tests pass, TypeScript passes, lint 0 errors/7 existing warnings, web build passes.
+- `npm run test:e2e`: 14 pass across Chromium and WebKit. Added deletion/persistence
+  verification and deterministic denied-location fallback. Permission denial is
+  simulated at the browser API boundary; this does not test Android system dialogs.
+- Production dependency audit: 0 known vulnerabilities at time of run.
+- Android lint rerun: succeeds, 0 errors/28 existing warnings. Native runtime and
+  package source unchanged; existing September 15 independent binaries remain applicable.
+- Seven refreshed 1080x1920 mobile-web draft previews visually inspected. They are
+  viewport captures with scrollable content, not final native store screenshots.
+- adb still lists no devices; Android emulator/system images are not installed.
+
+## Hosted Android CI repair (September 16)
+
+The setup action's default `tools platform-tools` package list failed because the
+obsolete `tools` package is no longer available. Explicitly request platform-tools
+and use the runner's existing accepted SDK licenses; disable automatic acceptance
+of additional SDK agreements. The prior failure occurred before app compilation.

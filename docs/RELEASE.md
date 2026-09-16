@@ -1,6 +1,6 @@
 # Android first; iOS next
 
-Prepared on 2026-09-10. This repository is **not yet a store submission**.
+Refreshed on 2026-09-15. This repository is **not yet a store submission**.
 
 ## Shared configuration
 
@@ -14,13 +14,19 @@ Prepared on 2026-09-10. This repository is **not yet a store submission**.
 - Privacy text and local-plan deletion are available at `/privacy`. Publish this at a stable
   public URL and add the publisher's real contact details before store submission.
 
+## Current release gate
+
+Admin reports the previous Play account is closed; no replacement publisher/package ownership
+or signing arrangement is verified. The current output is unsigned engineering preparation.
+See [reviewer packet](ANDROID-REVIEWER-PACKET.md) and [device QA record](ANDROID-DEVICE-QA.md).
+
 ## Artwork
 
-Android adaptive/legacy icons and iOS app icons/splashes were generated with `@capacitor/assets`
-from the existing `resources/icon.png`. Review the artwork on devices; the source is 512px and
-the iOS 1024px icon is upscaled. Five reproducible browser preview screenshots are included in `release-assets/screenshots`.
-Replace them with captures from the final native build for submission; a feature graphic is
-still needed.
+Android icons now use the app’s existing Lucide Plane geometry, with proper legacy shapes
+and a themed monochrome layer. Regenerate with `node scripts/prepare-android-artwork.mjs`.
+The Play icon and 1024×500 feature graphic are in `release-assets/store/`.
+iOS icons and splashes now use the local vector source via `scripts/prepare-native-splash.mjs`. Review the rendered artwork on devices. Five reproducible browser preview screenshots are included in `release-assets/screenshots`.
+Replace them with captures from the final native build for submission; a feature graphic is prepared in `release-assets/store/`.
 
 ## Android
 
@@ -59,8 +65,7 @@ bundle but does **not** configure signing; an unsigned bundle cannot be submitte
 Before release:
 
 - Confirm application ID, publisher, support contact, privacy URL, and version.
-- Address legacy launcher icon shapes and add themed monochrome icons; review generated
-  splash densities on devices. Prepare actual store screenshots,
+- Verify new legacy/adaptive/themed icons and existing splash densities on devices. Prepare actual store screenshots,
   Play icon (512×512), and feature graphic (1024×500).
 - Complete Data Safety, content rating, audience, and app-access declarations accurately.
 - Test an API 24 device and a current API 36 device: gesture/three-button navigation,
@@ -92,12 +97,14 @@ Java 21 is now available locally at `~/.local/share/jetsweep-toolchain/jdk`, and
 command-line tools are installed at `~/Library/Android/sdk`. API 36, Build Tools 36.0.0, Platform Tools, and Gradle 8.14.3 are installed.
 Downloaded archives were checked against their official repository checksums.
 Debug APK and unsigned release bundle compilation both pass. Android lint reports zero
-errors and 30 warnings, primarily generated artwork/resources and available updates.
+errors and 28 warnings, primarily generated artwork/resources and available updates.
 See TESTING.md for results and `release-assets/android-builds.json` for artifact hashes.
 The Homebrew installation failed during a dependency step; the scoped JDK was extracted from
 the verified Homebrew bottle and `java -version` succeeds. System Java defaults were not changed.
 
-Xcode 26.6 now passes its first-launch check and resolves the Capacitor Swift package. Native
+As of September 15, Xcode tools report an unaccepted license. No agreement was accepted.
+Standalone Command Line Tools git and the Android toolchain work independently.
+The earlier September 10 run resolved the Capacitor Swift package. Native
 iOS compilation is blocked because this Xcode requires the iOS 26.5 platform component;
 the installed iOS 26.2 simulator runtime is insufficient. The 8.52 GB component download was
 paused to prioritize Android. Resume it, then retry the simulator build:
@@ -112,3 +119,11 @@ Physical-device airplane-mode testing remains required.
 No signing keys, publisher accounts, or store submissions were created or modified.
 
 Reference: [Capacitor 8 migration/toolchain requirements](https://capacitorjs.com/docs/updating/8-0).
+
+### Superseding independent candidate
+
+Use `release-assets/candidates/2026-09-15-independent/` and its manifest for the
+new branding-clean build. The original September 15 candidate is superseded.
+See [independent hosting](INDEPENDENT-HOSTING.md) for the cleanup and migration
+limits. Native lint now reports 0 errors / 28 warnings. Publisher, signing,
+physical-device and iOS toolchain gates remain unchanged.

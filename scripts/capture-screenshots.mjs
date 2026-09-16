@@ -26,6 +26,8 @@ try {
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByLabel('Drive time (minutes)').fill('35');
   await page.getByRole('checkbox', { name: /TSA PreCheck/ }).check();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await capture('06-journey-options');
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.evaluate(() => window.scrollTo(0, 0));
   await capture('03-review');
@@ -41,7 +43,9 @@ try {
   await page.getByRole('button', { name: 'Make LGA my default' }).click();
   await page.getByRole('button', { name: 'Use my location' }).scrollIntoViewIfNeeded();
   await capture('05-airport-shortcuts');
-  console.log(`Saved five 1080×1920 browser-preview screenshots to ${output}`);
+  await page.goto(new URL('/privacy', page.url()).href);
+  await capture('07-privacy');
+  console.log(`Saved seven 1080×1920 mobile-web draft previews to ${output}`);
 } finally {
   await browser.close();
 }

@@ -1,5 +1,5 @@
 {
-  "builtOn": "2026-09-10",
+  "builtOn": "2026-09-15",
   "version": "0.1.0",
   "versionCode": 1,
   "debugSignatureVerified": true,
@@ -7,18 +7,20 @@
   "artifacts": [
     {
       "path": "android/app/build/outputs/apk/debug/app-debug.apk",
-      "bytes": 9001136,
-      "sha256": "831a8ed0e1b5dd9384bde3918dc1454e84e2b939dc484f24b7beb802b6486586"
+      "bytes": 9001296,
+      "sha256": "83731ddcc09536ef7d6942eedac69ad0acd776d8e0c9df58c0d35b30d25671cb"
     },
     {
       "path": "android/app/build/outputs/bundle/release/app-release.aab",
-      "bytes": 4212773,
-      "sha256": "17553da7e50277ae1ade55125e2595666397622b132458058ad52d20e7e1cde5"
+      "bytes": 3845762,
+      "sha256": "ce121ff9aae35f4cf466bb8b85cab255ba70cd5aa9b67b4ea550d81119f86f6e"
     }
   ],
   "features": [
     "optional-approximate-location",
     "saved-default-airport",
     "recent-airport-fallback"
-  ]
+  ],
+  "publisherIdentityVerified": false,
+  "candidate": "2026-09-15-independent"
 }

@@ -48,3 +48,7 @@ Airport defaults and location suggestions are documented in [Airport selection](
 Integration retains upstream revised airport buffer ranges, risk weights, and pickup timing.
 The upstream full-budget accumulation includes gate cushion and boarding offset; actual-drive
 rush-hour classification and original overdue timestamps remain applied.
+
+Release validation rejects unsupported airport codes and local calendar/time rollovers, including
+nonexistent DST spring-forward times. Repeated fall-back times still use the device Date interpretation;
+travelers must confirm the intended flight timezone/time. Invalid stored airport codes are discarded.

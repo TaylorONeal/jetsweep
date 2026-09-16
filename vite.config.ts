@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: "autoUpdate",
       disable: mode === "native",
-      includeAssets: ["favicon.ico"],
+      includeAssets: ["favicon.ico", "favicon.svg"],
       manifest: {
         name: "JetSweep – When to leave for the airport",
         short_name: "JetSweep",

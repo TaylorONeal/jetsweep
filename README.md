@@ -44,3 +44,6 @@ Recent plans stay in local storage and can be deleted from the Privacy page.
 
 Optional one-time location suggestions and saved airport defaults reduce repeat entry.
 See [airport selection](docs/AIRPORT-SELECTION.md) for coverage and privacy details.
+
+For portable static hosting, branding regeneration, and the platform-removal
+record, see [independent hosting](docs/INDEPENDENT-HOSTING.md).

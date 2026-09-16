@@ -29,3 +29,6 @@ dist-ssr
 keystore.properties
 playwright-report/
 test-results/
+
+# Locally assembled release candidates
+release-assets/candidates/
