@@ -25,8 +25,7 @@ See [reviewer packet](ANDROID-REVIEWER-PACKET.md) and [device QA record](ANDROID
 Android icons now use the app’s existing Lucide Plane geometry, with proper legacy shapes
 and a themed monochrome layer. Regenerate with `node scripts/prepare-android-artwork.mjs`.
 The Play icon and 1024×500 feature graphic are in `release-assets/store/`.
-iOS icons/splashes retain the earlier `@capacitor/assets` output from `resources/icon.png`. Review the artwork on devices; the source is 512px and
-the iOS 1024px icon is upscaled. Five reproducible browser preview screenshots are included in `release-assets/screenshots`.
+iOS icons and splashes now use the local vector source via `scripts/prepare-native-splash.mjs`. Review the rendered artwork on devices. Five reproducible browser preview screenshots are included in `release-assets/screenshots`.
 Replace them with captures from the final native build for submission; a feature graphic is prepared in `release-assets/store/`.
 
 ## Android
@@ -98,7 +97,7 @@ Java 21 is now available locally at `~/.local/share/jetsweep-toolchain/jdk`, and
 command-line tools are installed at `~/Library/Android/sdk`. API 36, Build Tools 36.0.0, Platform Tools, and Gradle 8.14.3 are installed.
 Downloaded archives were checked against their official repository checksums.
 Debug APK and unsigned release bundle compilation both pass. Android lint reports zero
-errors and 18 warnings, primarily generated artwork/resources and available updates.
+errors and 28 warnings, primarily generated artwork/resources and available updates.
 See TESTING.md for results and `release-assets/android-builds.json` for artifact hashes.
 The Homebrew installation failed during a dependency step; the scoped JDK was extracted from
 the verified Homebrew bottle and `java -version` succeeds. System Java defaults were not changed.

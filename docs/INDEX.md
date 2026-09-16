@@ -14,3 +14,4 @@
 - [Physical-device acceptance record](ANDROID-DEVICE-QA.md)
 
 - [Independent hosting and platform cleanup](INDEPENDENT-HOSTING.md)
+- [Privacy and data-safety facts for publisher review](DATA-SAFETY-FACTS.md)

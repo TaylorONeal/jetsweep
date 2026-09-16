@@ -47,3 +47,11 @@ flight selection, journey options, and completed departure timeline. Show the fu
 without debug overlays. Use actual app UI and do not imply live flight or traffic data.
 The browser test screenshots are visual QA evidence; physical-device release screenshots
 still need review before upload.
+
+## Review packet refresh: September 16
+
+Seven actual mobile-web draft previews now cover home, flight, review, plan,
+airport shortcuts, journey options, and privacy. They are not native screenshots
+or evidence of device QA. Existing owned icon and feature graphic are reused.
+[Data-safety facts](DATA-SAFETY-FACTS.md) supplies code evidence for publisher review;
+no policy questionnaire answers have been submitted or attested.

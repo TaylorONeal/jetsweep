@@ -95,3 +95,16 @@ lint: 0 errors, 28 warnings after consistent day/night splash generation.
 Browser favicon and image evidence, new hashes, and logs are in
 `release-assets/candidates/2026-09-15-independent/`. No physical-device QA or iOS
 compile was performed. This supersedes the earlier artwork candidate.
+
+## September 16 follow-up
+
+- `npm run check`: 56 tests pass, TypeScript passes, lint 0 errors/7 existing warnings, web build passes.
+- `npm run test:e2e`: 14 pass across Chromium and WebKit. Added deletion/persistence
+  verification and deterministic denied-location fallback. Permission denial is
+  simulated at the browser API boundary; this does not test Android system dialogs.
+- Production dependency audit: 0 known vulnerabilities at time of run.
+- Android lint rerun: succeeds, 0 errors/28 existing warnings. Native runtime and
+  package source unchanged; existing September 15 independent binaries remain applicable.
+- Seven refreshed 1080x1920 mobile-web draft previews visually inspected. They are
+  viewport captures with scrollable content, not final native store screenshots.
+- adb still lists no devices; Android emulator/system images are not installed.
