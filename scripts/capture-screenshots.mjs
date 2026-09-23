@@ -26,7 +26,7 @@ try {
   browser = await chromium.launch();
   const context = await browser.newContext({
     viewport: { width: 360, height: 640 }, deviceScaleFactor: 3,
-    isMobile: true, hasTouch: true, reducedMotion: 'reduce', timezoneId: 'America/New_York',
+    locale: 'en-US', isMobile: true, hasTouch: true, reducedMotion: 'reduce', timezoneId: 'America/New_York',
   });
   const page = await context.newPage();
   await page.clock.setFixedTime(new Date('2030-06-10T09:00:00Z'));
@@ -70,7 +70,7 @@ try {
     schemaVersion: 1, provenance: 'mobile-web-preview', nativeCapture: false,
     sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(),
     browser: `Chromium ${browser.version()}`, viewport: { width: 360, height: 640, scale: 3 },
-    timezone: 'America/New_York', sampleClock: '2030-06-10T09:00:00Z',
+    locale: 'en-US', timezone: 'America/New_York', sampleClock: '2030-06-10T09:00:00Z',
     simulatedLocation: 'Midtown Manhattan', captures,
   }, null, 2) + '\n');
   console.log(`Saved seven 1080×1920 mobile-web draft previews to ${output}`);
