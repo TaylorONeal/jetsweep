@@ -61,3 +61,11 @@ findings. Do not describe estimates as live traffic, flight, or security-wait da
 
 This audit changed documentation only. It did not execute new native/device tests,
 configure signing, edit account settings, accept agreements, or submit to a store.
+
+## Automated timezone regression coverage
+
+`npm run test:timezones` runs departure/timeline tests in separate Node processes
+for UTC, New York, London, and Makassar. It checks real seasonal offsets, local
+midnight persistence, previous-day departure plans, and US/UK spring-forward gaps.
+CI runs this alongside existing web and Android checks. This does not replace
+physical-device clock/timezone, WebView, or offline acceptance.
