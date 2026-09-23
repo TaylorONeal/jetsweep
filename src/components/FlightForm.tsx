@@ -426,7 +426,7 @@ export function FlightForm({ onSubmit, initialInputs }: FlightFormProps) {
             <ArrowLeft className="w-4 h-4" />
           </Button>
         )}
-        <Button type="submit" variant="gold" className="flex-1 min-h-12">
+        <Button type="submit" variant="gold" className="flex-1 min-w-0 min-h-12 h-auto whitespace-normal">
           {step === 2 ? "Build my departure plan" : "Continue"}
           <ArrowRight className="w-4 h-4" />
         </Button>

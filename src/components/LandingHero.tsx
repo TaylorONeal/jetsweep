@@ -149,9 +149,9 @@ export function LandingHero({ onStart, recentSearches = [], onQuickSearch }: Lan
           </h1>
 
           {/* Airplane motion divider */}
-          <div className="my-10 relative">
+          <div className="my-8 relative h-5 flex items-center">
             <div
-              className="h-px"
+              className="h-px w-full"
               style={{
                 background: 'linear-gradient(90deg, transparent, hsl(var(--border)) 20%, hsl(var(--border)) 80%, transparent)',
               }}
