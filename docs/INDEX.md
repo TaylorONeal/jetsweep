@@ -15,3 +15,5 @@
 
 - [Independent hosting and platform cleanup](INDEPENDENT-HOSTING.md)
 - [Privacy and data-safety facts for publisher review](DATA-SAFETY-FACTS.md)
+
+- [Current Android launch workstream and release gates](ANDROID-LAUNCH-CHECKLIST.md)
