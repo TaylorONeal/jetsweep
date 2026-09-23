@@ -69,3 +69,21 @@ for UTC, New York, London, and Makassar. It checks real seasonal offsets, local
 midnight persistence, previous-day departure plans, and US/UK spring-forward gaps.
 CI runs this alongside existing web and Android checks. This does not replace
 physical-device clock/timezone, WebView, or offline acceptance.
+
+## Actionable backlog IDs
+
+| ID | Next action | Owner | Blocker / required evidence |
+| --- | --- | --- | --- |
+| JS-01 | Download exact-commit CI preview artifact and review seven images + manifest | Engineering/reviewer | CI run and manifest hashes; browser previews only |
+| JS-02 | Capture API 24 and API 36+ installed candidate results for every QA row | Release tester | Devices + candidate hash; record WebView, navigation mode, actual pass/fail |
+| JS-03 | Capture native plan, journey, review, shortcuts, flight shots using shot plan | Release tester | JS-02; signed candidate, device provenance and unclipped controls |
+| JS-04 | Supply approved publisher contact and owned support/privacy URLs; implement and verify live pages | Publisher then engineering | Real approved values; HTTP reachability and matching in-app/store links |
+| JS-05 | Verify package/version availability and approved upload-key custody | Publisher | Console evidence and upload certificate; never commit key or credentials |
+| JS-06 | Build signed release candidate and verify its signer and SHA-256 | Engineering | JS-05; approved key access, reproducible commit and signing evidence |
+| JS-07 | Review final merged manifest/SDKs against data inventory and policy questionnaires | Publisher + engineering | JS-04/06; signed build and approved Data Safety, audience, rating/app access |
+| JS-08 | Install via Play internal testing, repeat recovery/offline, resolve pre-launch findings | Release tester + engineering | Organization verification and JS-06; report + device results |
+| JS-09 | Submit production release after checklist acceptance | Publisher | JS-02 through JS-08 complete; account-specific testing/production access met |
+
+JS-01 is automatically prepared by CI, not evidence that JS-02 or JS-03 passed.
+The September 23 local runtime could not launch Chromium (download archive failure);
+CI capture status and visual review of its output must be checked separately.
