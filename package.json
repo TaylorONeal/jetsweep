@@ -20,7 +20,8 @@
     "android:debug": "node scripts/android.mjs assembleDebug",
     "android:bundle": "node scripts/android.mjs bundleRelease",
     "test:e2e": "npm run build && playwright test",
-    "android:lint": "node scripts/android.mjs lintDebug"
+    "android:lint": "node scripts/android.mjs lintDebug",
+    "test:timezones": "node scripts/test-timezones.mjs"
   },
   "dependencies": {
     "@capacitor/core": "^8.4.3",
