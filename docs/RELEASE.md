@@ -1,6 +1,7 @@
 # Android first; iOS next
 
-Refreshed on 2026-09-15. This repository is **not yet a store submission**.
+Engineering notes refreshed on 2026-09-15. Current September 23 release gates are in
+[the Android launch checklist](ANDROID-LAUNCH-CHECKLIST.md). This repository is **not yet a store submission**.
 
 ## Shared configuration
 
@@ -16,8 +17,9 @@ Refreshed on 2026-09-15. This repository is **not yet a store submission**.
 
 ## Current release gate
 
-Admin reports the previous Play account is closed; no replacement publisher/package ownership
-or signing arrangement is verified. The current output is unsigned engineering preparation.
+The previous closed-account report is historical; current publisher status is tracked
+in the private GTM checklist. Package ownership and release signing remain unverified
+in this repository. The current output is unsigned engineering preparation.
 See [reviewer packet](ANDROID-REVIEWER-PACKET.md) and [device QA record](ANDROID-DEVICE-QA.md).
 
 ## Artwork
@@ -122,8 +124,10 @@ Reference: [Capacitor 8 migration/toolchain requirements](https://capacitorjs.co
 
 ### Superseding independent candidate
 
-Use `release-assets/candidates/2026-09-15-independent/` and its manifest for the
-new branding-clean build. The original September 15 candidate is superseded.
+The branding-clean September 15 candidate superseded the earlier candidate locally.
+Neither historical candidate directory is checked into this repository. Use the
+[successful baseline CI run](https://github.com/TaylorONeal/jetsweep/actions/runs/35047503207)
+for the main-branch debug APK and unsigned AAB, or rebuild the approved commit.
 See [independent hosting](INDEPENDENT-HOSTING.md) for the cleanup and migration
 limits. Native lint now reports 0 errors / 28 warnings. Publisher, signing,
 physical-device and iOS toolchain gates remain unchanged.

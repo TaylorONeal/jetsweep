@@ -10,8 +10,10 @@ verified publisher-owned. Artifacts and hashes: `release-assets/candidates/2026-
 Debug APK uses a local development signer. Release AAB is unsigned. No account agreements,
 new signing keys, production auth changes, store uploads, push, or merge were performed in this pass.
 
-Admin reported the previous publisher account closed for inactivity and non-reactivatable;
-no replacement account or owned package identity is verified. Account follow-up stays with Admin.
+The previous closed-account report is historical. Current publisher account status
+is tracked privately; package ownership and upload signing are still release gates.
+See the [current launch checklist](ANDROID-LAUNCH-CHECKLIST.md) for available CI
+artifacts and remaining work. Historical local candidate paths below are not checked in.
 
 ## Reviewer walkthrough (no account required)
 
