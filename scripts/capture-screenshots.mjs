@@ -32,6 +32,9 @@ try {
   await page.clock.setFixedTime(new Date('2030-06-10T09:00:00Z'));
   const capture = async name => {
     await page.evaluate(() => document.fonts.ready);
+    if (await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)) {
+      throw new Error(`Horizontal content overflow in ${name}; review the actual UI before saving store previews.`);
+    }
     const bytes = await page.screenshot({ path: join(output, `${name}.png`), animations: 'disabled' });
     captures.push({ file: `${name}.png`, width: 1080, height: 1920, sha256: createHash('sha256').update(bytes).digest('hex'), scrollY: await page.evaluate(() => window.scrollY) });
   };

@@ -23,14 +23,15 @@ It explicitly records `nativeCapture: false`. Fonts are ready before each captur
 
 CI captures after browser tests and uploads `jetsweep-mobile-web-store-previews`.
 Download that artifact for the exact reviewed commit; do not relabel it as a native
-capture. The existing checked-in images predate this manifest pipeline.
+capture. Reviewed snapshots and their matching manifest are checked in for durable evidence.
 
 ## September 23 visual review and shot plan
 
 All seven existing previews and the 1024×500 feature graphic were visually reviewed.
 The dark/gold visual language, contrast, and readable controls are consistent.
-Keep the icon and feature graphic. The home-screen decorative plane is clipped by
-its divider; this is real UI, not an image defect to paint over. The flight form,
+Keep the icon and feature graphic. Fresh CI review identified the home-screen plane clipped by a 1px divider and
+the review CTA overflowing a narrow viewport. Both were corrected in the actual UI
+with bounded sizing/wrapping changes; capture now rejects horizontal overflow. The flight form,
 journey and privacy screens are long, so these excerpts omit lower content. Do not
 claim the privacy excerpt demonstrates the deletion controls or entire policy.
 
