@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "provenance": "mobile-web-preview",
+  "nativeCapture": false,
+  "sourceCommit": "7541a4cdf484a9d6d612b87875a27f92e83cebb6",
+  "browser": "Chromium 153.0.8010.12",
+  "viewport": {
+    "width": 360,
+    "height": 640,
+    "scale": 3
+  },
+  "locale": "en-US",
+  "timezone": "America/New_York",
+  "sampleClock": "2030-06-10T09:00:00Z",
+  "simulatedLocation": "Midtown Manhattan",
+  "captures": [
+    {
+      "file": "01-home.png",
+      "width": 1080,
+      "height": 1920,
+      "sha256": "7f7e4da1bad86c1504049fbe834ea57aedb8789944be950cba4fc81b709e0256",
+      "scrollY": 0
+    },
+    {
+      "file": "02-flight.png",
+      "width": 1080,
+      "height": 1920,
+      "sha256": "430a24b13fc34349c56f4f90078103d84ca2be7836d0590c071fc0b0de8a73f4",
+      "scrollY": 0
+    },
+    {
+      "file": "06-journey-options.png",
+      "width": 1080,
+      "height": 1920,
+      "sha256": "149410dcef6ce927e79c472f77c96c8b986875c3b8c36ee34ff184a698dab56c",
+      "scrollY": 0
+    },
+    {
+      "file": "03-review.png",
+      "width": 1080,
+      "height": 1920,
+      "sha256": "f90837a1d436761d5cda68eaab7f57159f6465703a74cf6bafd286a0096f4416",
+      "scrollY": 0
+    },
+    {
+      "file": "04-plan.png",
+      "width": 1080,
+      "height": 1920,
+      "sha256": "5e966c1044284c6fcb444814bb06af24127069cc009fed988ca980f00d4bb392",
+      "scrollY": 0
+    },
+    {
+      "file": "05-airport-shortcuts.png",
+      "width": 1080,
+      "height": 1920,
+      "sha256": "d509e66f8b0b80cddede4aee9e182e3b13f42340dc86bf745d712ff9de3ea145",
+      "scrollY": 339
+    },
+    {
+      "file": "07-privacy.png",
+      "width": 1080,
+      "height": 1920,
+      "sha256": "058d353a6670f2d1c1dd360c10607e9ac031d4ada8522e9f987ccf11b16774f6",
+      "scrollY": 0
+    }
+  ]
+}

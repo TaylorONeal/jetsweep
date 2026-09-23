@@ -86,4 +86,12 @@ physical-device clock/timezone, WebView, or offline acceptance.
 
 JS-01 is automatically prepared by CI, not evidence that JS-02 or JS-03 passed.
 The September 23 local runtime could not launch Chromium (download archive failure);
-CI capture status and visual review of its output must be checked separately.
+CI provided the fresh capture evidence recorded below.
+
+JS-01 completed September 23: seven refreshed 1080×1920 mobile-web PNGs and matching
+`release-assets/screenshots/manifest.json` stored in Git. Capture evidence is
+[CI run 35811092968](https://github.com/TaylorONeal/jetsweep/actions/runs/35811092968),
+source checkout `7541a4cdf484a9d6d612b87875a27f92e83cebb6` (PR merge checkout).
+All PNG hashes and dimensions verified; all seven screens visually reviewed across
+final/prior-identical outputs. Plane clipping and review-button overflow corrected
+in actual UI. Native evidence remains pending under JS-02/03.
